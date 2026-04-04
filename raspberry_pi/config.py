@@ -4,6 +4,8 @@ Edit these values to match your hardware and server location.
 """
 
 # ─── Vehicle Identity ────────────────────────────────────────
+import os
+
 VEHICLE_ID = "car-001"               # Unique ID for this vehicle
 
 # ─── Server Configuration ───────────────────────────────────
@@ -16,7 +18,7 @@ CAPTURE_INTERVAL = 0.033             # Seconds — capture for 30 FPS
 
 # ─── YOLOv8 Pothole Detection ───────────────────────────────
 USE_CLOUD_API = False                 # Set to False to run local YOLO model (.pt file)
-YOLO_MODEL_PATH = "best.pt"
+YOLO_MODEL_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "runs", "detect", "pothole_blur_augmented2", "weights", "best.pt"))
 
 # Cloud API configuration (used if USE_CLOUD_API is True)
 ROBOFLOW_MODEL_ID = "pothole-detection-orxff/1"
@@ -24,16 +26,9 @@ ROBOFLOW_MODEL_ID = "pothole-detection-orxff/1"
 POTHOLE_CONFIDENCE_THRESHOLD = 0.5
 POTHOLE_CLASS_NAME = "pothole"
 
-# ─── Thermal Camera (MLX90640) ───────────────────────────────
-THERMAL_I2C_ADDRESS = 0x33
-THERMAL_REFRESH_RATE = 2
-ANIMAL_TEMP_MIN = 30.0
-ANIMAL_TEMP_MAX = 42.0
-ANIMAL_BLOB_MIN_PIXELS = 8
-THERMAL_SCAN_INTERVAL = 2.0
 
 # ─── GPS Module (NEO-6M) ────────────────────────────────────
-GPS_SERIAL_PORT = "/dev/ttyS0"
+GPS_SERIAL_PORT = "/dev/serial0"
 GPS_BAUD_RATE = 9600
 GPS_READ_INTERVAL = 1.0
 

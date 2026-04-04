@@ -21,21 +21,23 @@ from config import (
     API_BASE_URL, VEHICLE_ID,
     CAMERA_RESOLUTION, CAPTURE_INTERVAL,
     YOLO_MODEL_PATH, POTHOLE_CONFIDENCE_THRESHOLD, SEVERITY_THRESHOLDS,
-    ANIMAL_TEMP_MIN, ANIMAL_TEMP_MAX, ANIMAL_BLOB_MIN_PIXELS, THERMAL_REFRESH_RATE,
-    THERMAL_SCAN_INTERVAL,
     GPS_SERIAL_PORT, GPS_BAUD_RATE,
     BUZZER_GPIO_PIN, BUZZER_COOLDOWN,
-    BUZZER_PATTERN_POTHOLE, BUZZER_PATTERN_ANIMAL, BUZZER_PATTERN_VERIFIED,
+    BUZZER_PATTERN_POTHOLE, BUZZER_PATTERN_VERIFIED,
     OFFLINE_QUEUE_FILE, MAX_QUEUE_SIZE,
     NEARBY_CHECK_RADIUS, NEARBY_CHECK_INTERVAL,
     LOG_LEVEL, LOG_FILE
 )
 
 from pothole_detector import PotholeDetector
-from thermal_detector import ThermalDetector
 from gps_reader import GPSReader
 from buzzer import Buzzer
 from api_client import APIClient
+
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+except Exception:
+    pass
 
 try:
     import cv2
@@ -49,7 +51,7 @@ logging.basicConfig(
     format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
     handlers=[
         logging.StreamHandler(sys.stdout),
-        logging.FileHandler(LOG_FILE, mode='a')
+        logging.FileHandler(LOG_FILE, mode='a', encoding='utf-8')
     ]
 )
 logger = logging.getLogger("RoadGuard")
@@ -86,22 +88,20 @@ class RoadGuardSystem:
 
         self.camera = None
         self.pothole_detector = None
-        self.thermal_detector = None
         self.gps = None
         self.buzzer = None
         self.api_client = None
 
         self._init_camera()
         self._init_pothole_detector()
-        self._init_thermal_detector()
         self._init_gps()
         self._init_buzzer()
         self._init_api_client()
 
         # Timing
         self.last_capture_time = 0
-        self.last_thermal_time = 0
         self.last_nearby_check_time = 0
+        self.last_detection_time = 0
 
         # Cache of known nearby potholes from the server
         self.known_potholes = []
@@ -110,7 +110,7 @@ class RoadGuardSystem:
         self.recently_handled = {}  # pothole_id -> timestamp
 
         # Stats
-        self.stats = {"new_potholes": 0, "verified": 0, "resolved": 0, "animals": 0}
+        self.stats = {"new_potholes": 0, "verified": 0, "resolved": 0}
 
         self._print_status()
 
@@ -118,18 +118,22 @@ class RoadGuardSystem:
 
     def _init_camera(self):
         if CV2_AVAILABLE:
-            try:
-                self.camera = cv2.VideoCapture(0)
-                self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, CAMERA_RESOLUTION[0])
-                self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, CAMERA_RESOLUTION[1])
-                if self.camera.isOpened():
-                    logger.info(f"📷 Camera: ✅ ({CAMERA_RESOLUTION[0]}x{CAMERA_RESOLUTION[1]})")
-                else:
-                    logger.error("📷 Camera: ❌ Failed to open")
-                    self.camera = None
-            except Exception as e:
-                logger.error(f"Camera error: {e}")
-                self.camera = None
+            for idx in range(10):
+                try:
+                    self.camera = cv2.VideoCapture(idx)
+                    if self.camera.isOpened():
+                        ret, _ = self.camera.read()
+                        if ret:
+                            self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, CAMERA_RESOLUTION[0])
+                            self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, CAMERA_RESOLUTION[1])
+                            logger.info(f"📷 Camera: ✅ (Index {idx}, {CAMERA_RESOLUTION[0]}x{CAMERA_RESOLUTION[1]})")
+                            return
+                        else:
+                            self.camera.release()
+                except Exception as e:
+                    logger.debug(f"Camera index {idx} failed: {e}")
+            logger.error("📷 Camera: ❌ Failed to open any capture index")
+            self.camera = None
         else:
             logger.warning("📷 Camera: ❌ OpenCV not available")
 
@@ -141,12 +145,6 @@ class RoadGuardSystem:
         )
         logger.info(f"🕳️  Detector: {'✅' if self.pothole_detector.is_ready() else '❌'}")
 
-    def _init_thermal_detector(self):
-        self.thermal_detector = ThermalDetector(
-            temp_min=ANIMAL_TEMP_MIN, temp_max=ANIMAL_TEMP_MAX,
-            min_blob_pixels=ANIMAL_BLOB_MIN_PIXELS, refresh_rate=THERMAL_REFRESH_RATE
-        )
-        logger.info(f"🌡️  Thermal: {'✅' if self.thermal_detector.is_ready() else '⚠️ Sim mode'}")
 
     def _init_gps(self):
         self.gps = GPSReader(port=GPS_SERIAL_PORT, baud_rate=GPS_BAUD_RATE)
@@ -195,11 +193,6 @@ class RoadGuardSystem:
                     self.last_capture_time = now
                     self._process_frame(gps_data)
 
-                # 4. Thermal animal detection
-                if now - self.last_thermal_time >= THERMAL_SCAN_INTERVAL:
-                    self.last_thermal_time = now
-                    self._detect_animals(gps_data)
-
                 time.sleep(0.01)
 
             except Exception as e:
@@ -242,6 +235,9 @@ class RoadGuardSystem:
         if not ret or frame is None:
             return
 
+        if time.time() - self.last_detection_time < 2.0:
+            return
+
         lat = gps_data["lat"] if gps_data else 0.0
         lng = gps_data["lng"] if gps_data else 0.0
 
@@ -277,6 +273,8 @@ class RoadGuardSystem:
                     action = result.get("action", "reported") if result else "queued"
                     logger.info(f"🕳️  NEW POTHOLE [{action}] severity={severity} "
                                f"conf={confidence:.0%} at ({lat:.5f}, {lng:.5f})")
+            
+            self.last_detection_time = time.time()
         else:
             # No pothole detected — check if we're passing a known one
             self._check_absent_potholes(lat, lng)
@@ -311,32 +309,6 @@ class RoadGuardSystem:
             return True
         return False
 
-    # ─── Animal Detection ───────────────────────────────────
-
-    def _detect_animals(self, gps_data):
-        if not self.thermal_detector:
-            return
-
-        detections = self.thermal_detector.scan()
-        if not detections:
-            return
-
-        lat = gps_data["lat"] if gps_data else 0.0
-        lng = gps_data["lng"] if gps_data else 0.0
-
-        for det in detections:
-            self.stats["animals"] += 1
-            logger.info(f"🐾 ANIMAL: {det['animal_type']} temp={det['avg_temperature']}°C "
-                       f"at ({lat:.5f}, {lng:.5f})")
-
-            self.buzzer.alert_animal(BUZZER_PATTERN_ANIMAL)
-            self.api_client.send_animal(
-                lat=lat, lng=lng,
-                animal_type=det["animal_type"],
-                temperature=det["avg_temperature"],
-                confidence=det["confidence"],
-                description=f"Thermal ({det['warm_pixel_count']} warm pixels)"
-            )
 
     # ─── Shutdown ───────────────────────────────────────────
 
@@ -353,7 +325,6 @@ class RoadGuardSystem:
         logger.info(f"  New potholes reported: {self.stats['new_potholes']}")
         logger.info(f"  Potholes verified:     {self.stats['verified']}")
         logger.info(f"  Potholes resolved:     {self.stats['resolved']}")
-        logger.info(f"  Animals detected:      {self.stats['animals']}")
         logger.info(f"  Offline queue:         {self.api_client.get_queue_size()} pending")
         logger.info("Goodbye! 👋\n")
 

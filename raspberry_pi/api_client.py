@@ -104,18 +104,6 @@ class APIClient:
             logger.warning(f"Resolve failed: {e}")
         return None
 
-    # ─── Animal Operations ──────────────────────────────────
-
-    def send_animal(self, lat, lng, animal_type="unknown", temperature=0.0,
-                    confidence=0.0, description="", image_url="", detected_at=None):
-        data = {
-            "lat": lat, "lng": lng,
-            "animal_type": animal_type, "temperature": temperature,
-            "confidence": confidence, "description": description,
-            "image_url": image_url, "vehicle_id": self.vehicle_id,
-            "detected_at": detected_at or time.strftime('%Y-%m-%dT%H:%M:%S')
-        }
-        self._send_async("animals", data)
 
     # ─── Network Layer ──────────────────────────────────────
 

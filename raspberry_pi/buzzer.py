@@ -10,11 +10,11 @@ import threading
 logger = logging.getLogger(__name__)
 
 try:
-    import RPi.GPIO as GPIO
-    GPIO_AVAILABLE = True
+    from gpiozero import Buzzer as GpioBuzzer
+    GPIOZERO_AVAILABLE = True
 except ImportError:
-    GPIO_AVAILABLE = False
-    logger.warning("RPi.GPIO not available — buzzer in simulation mode")
+    GPIOZERO_AVAILABLE = False
+    logger.warning("gpiozero not available — buzzer in simulation mode")
 
 
 class Buzzer:
@@ -32,18 +32,16 @@ class Buzzer:
         self.cooldown = cooldown
         self.last_alert_time = 0
         self._playing = False
-        self._lock = threading.Lock()
+        self._buzzer = None
 
-        if GPIO_AVAILABLE:
+        if GPIOZERO_AVAILABLE:
             try:
-                GPIO.setmode(GPIO.BCM)
-                GPIO.setup(self.pin, GPIO.OUT)
-                GPIO.output(self.pin, GPIO.LOW)
-                logger.info(f"Buzzer initialized on GPIO pin {pin}")
+                self._buzzer = GpioBuzzer(self.pin)
+                logger.info(f"Buzzer initialized on GPIO pin {pin} using gpiozero")
             except Exception as e:
                 logger.error(f"Buzzer GPIO setup failed: {e}")
         else:
-            logger.info("Buzzer running in simulation mode (no GPIO)")
+            logger.info("Buzzer running in simulation mode (no gpiozero)")
 
     def alert_pothole(self, pattern=None):
         """
@@ -57,17 +55,6 @@ class Buzzer:
             pattern = [(0.2, 0.1), (0.2, 0.1), (0.2, 0.5)]
         self._play_pattern(pattern, "pothole")
 
-    def alert_animal(self, pattern=None):
-        """
-        Play animal alert pattern (double long beep).
-        
-        Args:
-            pattern: List of (on_seconds, off_seconds) tuples.
-                     Default: [(0.5, 0.2), (0.5, 0.5)]
-        """
-        if pattern is None:
-            pattern = [(0.5, 0.2), (0.5, 0.5)]
-        self._play_pattern(pattern, "animal")
 
     def _play_pattern(self, pattern, alert_type):
         """Play an alert pattern in a non-blocking thread."""
@@ -105,9 +92,9 @@ class Buzzer:
 
     def _buzzer_on(self):
         """Turn buzzer ON."""
-        if GPIO_AVAILABLE:
+        if GPIOZERO_AVAILABLE and self._buzzer:
             try:
-                GPIO.output(self.pin, GPIO.HIGH)
+                self._buzzer.on()
             except Exception:
                 pass
         else:
@@ -115,21 +102,18 @@ class Buzzer:
 
     def _buzzer_off(self):
         """Turn buzzer OFF."""
-        if GPIO_AVAILABLE:
+        if GPIOZERO_AVAILABLE and self._buzzer:
             try:
-                GPIO.output(self.pin, GPIO.LOW)
+                self._buzzer.off()
             except Exception:
                 pass
 
     def cleanup(self):
         """Clean up GPIO resources."""
         self._buzzer_off()
-        if GPIO_AVAILABLE:
-            try:
-                GPIO.cleanup(self.pin)
-                logger.info("Buzzer GPIO cleaned up")
-            except Exception:
-                pass
+        if self._buzzer:
+            self._buzzer.close()
+            logger.info("Buzzer gpiozero resources cleaned up")
 
 
 # ─── Standalone test ─────────────────────────────────────────
@@ -144,10 +128,6 @@ if __name__ == "__main__":
     buzzer.alert_pothole()
     time.sleep(3)
 
-    print("2. Animal alert (double long beep)")
-    buzzer.cooldown = 0  # Disable cooldown for test
-    buzzer.alert_animal()
-    time.sleep(3)
 
     buzzer.cleanup()
     print("Done.")

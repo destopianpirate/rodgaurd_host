@@ -66,7 +66,7 @@ class GPSReader:
                 elif line.startswith('$GPRMC') or line.startswith('$GNRMC'):
                     self._parse_rmc(line)
 
-            if self.latitude is not None and self.longitude is not None:
+            if self.has_fix():
                 self.last_update = time.time()
                 return {
                     "lat": self.latitude,
