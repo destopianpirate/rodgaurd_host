@@ -1,0 +1,533 @@
+/* ═══════════════════════════════════════════════════════════
+   SIDEBAR TWO-PANEL LAYOUT — Solid Color System
+   Dark:  Black → Grey → Orange
+   Light: White → Grey → Orange
+   NO BORDERS — uses var(--tier-1/2/3) from styles.css
+   ═══════════════════════════════════════════════════════════ */
+
+/* ─── Panel Base (Tier 1 — outermost) ──────────────────── */
+.panel {
+    background: var(--tier-1);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+    /* Contains the sweeping animation */
+}
+
+/* ─── Premium Glass Sweep Animation on Panels ─── */
+.panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.03) 50%,
+            rgba(255, 255, 255, 0) 100%);
+    transform: skewX(-20deg);
+    animation: premium-sweep 7s infinite ease-in-out;
+    pointer-events: none;
+    z-index: 0;
+}
+
+@keyframes premium-sweep {
+    0% {
+        left: -150%;
+    }
+
+    20% {
+        left: 200%;
+    }
+
+    100% {
+        left: 200%;
+    }
+}
+
+/* Ensure content stays above the sweep */
+.panel>* {
+    position: relative;
+    z-index: 1;
+}
+
+.panel-upper {
+    animation-delay: 0.05s;
+}
+
+.panel-lower {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation-delay: 0.15s;
+}
+
+/* ─── Panel Title (Lower) ──────────────────────────────── */
+.panel-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.panel-title-icon {
+    font-size: 0.9rem;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ROW 1: STATS ROW (Active | Resolved | Safety Grade)
+   ═══════════════════════════════════════════════════════════ */
+.stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+/* Tier 2 — middle layer (grey) */
+.stat-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: var(--tier-2);
+    border-radius: 16px;
+    /* Curvier */
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.02), 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* bouncy ease */
+}
+
+.stat-chip:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.08), 0 6px 16px rgba(0, 0, 0, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.chip-icon {
+    font-size: 1.1rem;
+}
+
+.chip-data {
+    display: flex;
+    flex-direction: column;
+}
+
+.chip-value {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1;
+    font-family: 'Nunito', sans-serif;
+}
+
+.chip-label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-top: 2px;
+}
+
+.chip-sublabel {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+}
+
+/* Safety Grade Circle — Solid Orange (Tier 3) */
+.grade-circle-sm {
+    width: 30px;
+    height: 30px;
+    border-radius: 12px;
+    /* Curvier */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #000;
+    background: var(--tier-3);
+    border: none;
+    flex-shrink: 0;
+    box-shadow: 0 0 12px rgba(249, 115, 22, 0.4);
+    animation: grade-pulse-sm 2s infinite ease-in-out;
+}
+
+@keyframes grade-pulse-sm {
+
+    0%,
+    100% {
+        box-shadow: 0 0 8px rgba(249, 115, 22, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(249, 115, 22, 0.7);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ROW 2: WEATHER BOX (Tier 2 — grey)
+   ═══════════════════════════════════════════════════════════ */
+.weather-box {
+    padding: 10px 12px;
+    background: var(--tier-2);
+    border-radius: 16px;
+    /* Curvier */
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.02), 0 2px 10px rgba(0, 0, 0, 0.2);
+    margin-bottom: 10px;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Add shimmer to weather box */
+.weather-box::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.06) 50%,
+            rgba(255, 255, 255, 0) 100%);
+    transform: skewX(-20deg);
+    animation: weather-shimmer 4s infinite ease-in-out;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Ensure contents stay above shimmer */
+.weather-box>.weather-row {
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes weather-shimmer {
+    0% {
+        left: -150%;
+    }
+
+    50% {
+        left: 200%;
+    }
+
+    100% {
+        left: 200%;
+    }
+}
+
+.weather-box:hover {
+    transform: translateY(-2px);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.weather-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.weather-icon-sm {
+    font-size: 1.3rem;
+    display: inline-block;
+    animation: float-icon 3s ease-in-out infinite;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+@keyframes float-icon {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-3px);
+    }
+}
+
+.weather-temp-sm {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    font-family: 'Nunito', sans-serif;
+}
+
+.weather-condition {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    flex: 1;
+}
+
+.road-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    padding-top: 4px;
+    border-top: none;
+}
+
+.road-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #22c55e;
+    flex-shrink: 0;
+    animation: pulse-dot 2s ease infinite;
+}
+
+.road-dot.wet {
+    background: #ef4444;
+}
+
+.road-dot.may-wet {
+    background: #f97316;
+}
+
+.road-dot.dry {
+    background: #22c55e;
+}
+
+.weather-alert {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.4);
+    border-left: 3px solid var(--tier-3);
+    border-radius: 4px;
+    font-size: 0.72rem;
+    color: var(--text-primary);
+    line-height: 1.3;
+    animation: fade-in-up 0.5s ease forwards;
+}
+
+@keyframes pulse-dot {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.4;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ROW 3: SEVERITY INDEX (Tier 2 → Tier 3)
+   ═══════════════════════════════════════════════════════════ */
+.severity-box {
+    padding: 8px 12px;
+    background: var(--tier-2);
+    border-radius: 16px;
+    /* Curvier */
+    border: none;
+}
+
+.sev-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 8px 0;
+}
+
+.sev-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+}
+
+/* Tier 3 — innermost (solid orange) */
+.sev-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 4px;
+    background: var(--tier-3);
+    border-radius: 12px;
+    /* Curvier */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    /* slight shine */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.sev-item:hover {
+    transform: translateY(-3px) scale(1.05);
+    filter: brightness(1.15);
+    box-shadow: 0 8px 16px rgba(249, 115, 22, 0.4);
+    /* orange ambient glow */
+}
+
+.sev-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: block;
+}
+
+.sev-critical .sev-dot {
+    background: #fff;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+}
+
+.sev-high .sev-dot {
+    background: #fff;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
+}
+
+.sev-medium .sev-dot {
+    background: #fff;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
+}
+
+.sev-low .sev-dot {
+    background: #fff;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
+}
+
+.sev-count {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #000;
+    font-family: 'Nunito', sans-serif;
+    line-height: 1;
+}
+
+.sev-name {
+    font-size: 0.55rem;
+    color: #000;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LOWER PANEL: FEED (Tier 2 → Tier 3)
+   ═══════════════════════════════════════════════════════════ */
+.panel-lower .detection-feed {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--tier-2);
+    border-radius: 16px;
+    /* Curvier */
+    padding: 8px;
+    border: none;
+}
+
+/* Tier 3 — solid orange feed items */
+.feed-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    /* Premium glassmorphism base */
+    border: none !important;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+}
+
+.feed-item:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.feed-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.1);
+}
+
+.feed-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.feed-location {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 220px;
+}
+
+.feed-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.feed-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 10px;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.feed-empty-icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    opacity: 0.5;
+}
+
+.feed-empty p {
+    margin: 2px 0;
+    font-size: 0.8rem;
+}
+
+.feed-hint {
+    font-size: 0.7rem !important;
+    opacity: 0.6;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LIGHT THEME — only backgrounds change, orange stays
+   Everything uses var() so it auto-switches with toggle
+   ═══════════════════════════════════════════════════════════ */
+
+/* No extra light overrides needed — all backgrounds use 
+   var(--tier-1/2/3) which are already redefined in 
+   [data-theme="light"] inside styles.css */

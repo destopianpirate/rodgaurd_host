@@ -1,0 +1,595 @@
+# 🛡️ RoadGuard — Complete Project Documentation
+## Advanced Pothole Detection & Road Safety System
+
+> A Raspberry Pi–powered smart vehicle system that detects potholes using AI (YOLOv8), monitors road conditions with IMU sensors, and displays everything in real-time on a beautiful web dashboard.
+
+---
+
+# 📑 Table of Contents
+
+1. [Section 1 — File & Folder Structure](#section-1--file--folder-structure)
+2. [Section 2 — Step-by-Step Setup Guide (From Zero)](#section-2--step-by-step-setup-guide-from-zero)
+3. [Section 3 — How Everything Works](#section-3--how-everything-works)
+
+---
+
+# Section 1 — File & Folder Structure
+
+The project has **three main folders**, each handling a different part of the system:
+
+```
+Pothole/
+├── raspberry_pi/       ← Runs on the Raspberry Pi inside the vehicle
+│   ├── config.py
+│   ├── main.py
+│   ├── pothole_detector.py
+│   ├── gps_reader.py
+│   ├── buzzer.py
+│   ├── imu_sensor.py
+│   ├── api_client.py
+│   └── requirements.txt
+│
+├── server/             ← Runs on your laptop/PC (Flask backend)
+│   ├── app.py
+│   ├── detections.db
+│   └── requirements.txt
+│
+└── website/            ← Runs in the browser (Dashboard UI)
+    ├── index.html
+    ├── styles.css
+    ├── app_v16.js
+    ├── app.js           (older version, not used)
+    ├── app_v7.js        (older version, not used)
+    └── css/
+        └── sidebar-revamp.css
+```
+
+---
+
+## 📂 `raspberry_pi/` — The Vehicle Device (Runs on Raspberry Pi)
+
+This folder contains all the Python code that runs **inside the car** on the Raspberry Pi.
+
+### `config.py` — Configuration File
+**Purpose**: Central settings file. Every adjustable parameter is defined here so you never need to dig into other files to change settings.
+
+**What it controls**:
+| Setting | Default Value | Description |
+|---|---|---|
+| `VEHICLE_ID` | `"car-001"` | Unique identifier for this specific vehicle |
+| `API_BASE_URL` | `http://YOUR_SERVER_IP:5000/api` | URL of the Flask server running on your laptop |
+| `CAMERA_RESOLUTION` | `(640, 480)` | Camera capture resolution (width × height in pixels) |
+| `CAMERA_FRAMERATE` | `30` | How many frames per second the camera captures |
+| `CAPTURE_INTERVAL` | `0.5` | Seconds between each AI detection cycle |
+| `YOLO_MODEL_PATH` | `"yolov8n.pt"` | Path to the YOLOv8 AI model weights file |
+| `POTHOLE_CONFIDENCE_THRESHOLD` | `0.5` | Minimum AI confidence (0–1) to accept a detection |
+| `IMU_I2C_ADDRESS` | `0x68` | I2C address of the MPU-9250 IMU sensor |
+| `GPS_SERIAL_PORT` | `"/dev/ttyS0"` | Serial UART port for the NEO-M8N GPS module |
+| `GPS_BAUD_RATE` | `9600` | Communication speed (baud rate) for GPS |
+| `BUZZER_GPIO_PIN` | `18` | GPIO pin number (BCM) where the buzzer is connected |
+| `BUZZER_COOLDOWN` | `3.0` | Minimum seconds between buzzer alerts |
+| `NEARBY_CHECK_RADIUS` | `150` meters | Radius to fetch known potholes from the server |
+
+---
+
+### `main.py` — Main Detection Loop (The Brain)
+**Purpose**: The **primary entry point** that runs on boot. It initializes all hardware, runs the detection loop forever, and coordinates all modules.
+
+**What it does step by step**:
+1. Imports and initializes all modules (camera, GPS, buzzer, IMU sensor, API client)
+2. Starts an infinite loop that runs every 0.5 seconds:
+   - Reads GPS coordinates from the NEO-M8N module
+   - Reads IMU sensor data (accelerometer, gyroscope, magnetometer) for road condition monitoring
+   - Captures a camera frame
+   - Runs YOLOv8 AI on the frame to detect potholes
+   - If a pothole is detected:
+     - Checks if it matches a **known** pothole from the server → **verifies** it
+     - If no match → **reports** it as a NEW pothole
+     - Triggers the buzzer with a triple-beep alert
+   - If no pothole detected but we're near a known one → **resolves** it (it's been fixed!)
+   - Sends all data to the Flask server via HTTP API
+3. Handles graceful shutdown on `Ctrl+C`
+
+**Key class**: `RoadGuardSystem` — contains all the logic
+
+---
+
+### `pothole_detector.py` — AI Pothole Detection (YOLOv8)
+**Purpose**: Wraps the YOLOv8 neural network model to detect potholes in camera frames.
+
+**How it works**:
+1. Loads the YOLOv8 model file (`yolov8n.pt`) into memory
+2. When given a camera frame (image), runs AI inference
+3. For each detected pothole, calculates:
+   - **Bounding box** — where in the image the pothole is
+   - **Confidence** — how sure the AI is (0% to 100%)
+   - **Severity** — based on the pothole's size relative to the frame:
+     - `critical` — covers >15% of the frame (very large/close)
+     - `high` — covers >8% of the frame
+     - `medium` — covers >3% of the frame
+     - `low` — smaller detections
+
+---
+
+### `gps_reader.py` — GPS Module Interface
+**Purpose**: Reads real-time GPS coordinates from the NEO-M8N module via UART serial communication.
+
+**How it works**:
+1. Opens a serial connection on `/dev/ttyS0` at 9600 baud
+2. Reads NMEA sentences (`$GPGGA` for position, `$GPRMC` for speed)
+3. Parses raw NMEA coordinates (`DDDMM.MMMMM`) into decimal degrees
+4. Returns: latitude, longitude, speed (km/h), altitude, satellite count
+
+---
+
+### `buzzer.py` — Buzzer Alert System
+**Purpose**: Controls the Electronic Spices Active Alarm Buzzer Driver Module (3.3V–5V) connected to GPIO pin 18 to alert the driver.
+
+**Alert patterns**:
+| Alert Type | Pattern | Sound |
+|---|---|---|
+| New Pothole | `[(0.2, 0.1), (0.2, 0.1), (0.2, 0.5)]` | Three quick beeps ⚡⚡⚡ |
+| Rough Road | `[(0.5, 0.2), (0.5, 0.5)]` | Two long beeps 🔔🔔 |
+| Verified Pothole | `[(0.1, 0.1), (0.1, 0.3)]` | Two short beeps |
+
+**Features**: Runs alerts in background threads (non-blocking), has a cooldown to prevent spam.
+
+---
+
+### `imu_sensor.py` — MPU-9250 IMU Sensor Module
+**Purpose**: Uses the MPU-9250 9DOF IMU Sensor (3-Axis Accelerometer, Gyroscope & Magnetometer) to monitor road surface conditions and vehicle dynamics.
+
+**How it works**:
+1. Communicates with the MPU-9250 via I2C (address 0x68)
+2. Reads 9 axes of motion data:
+   - **Accelerometer** (3-axis) — detects sudden bumps, jolts, and vibrations indicating rough roads or potholes
+   - **Gyroscope** (3-axis) — measures angular velocity, detects vehicle tilting from uneven road surfaces
+   - **Magnetometer** (3-axis) — provides heading/compass direction for navigation support
+3. Analyzes vibration patterns to supplement AI-based pothole detection
+4. Provides additional road quality scoring based on ride smoothness
+
+---
+
+### `api_client.py` — HTTP Client for Server Communication
+**Purpose**: Sends detection data from the Raspberry Pi to the Flask backend server over WiFi/network.
+
+**Endpoints it calls**:
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `POST` | `/api/pothole` | Report a new pothole or verify an existing one |
+| `GET` | `/api/pothole/nearby` | Fetch known active potholes near current GPS location |
+| `POST` | `/api/pothole/{id}/verify` | Confirm a known pothole is still there |
+| `POST` | `/api/pothole/{id}/resolve` | Mark a pothole as fixed/resolved |
+
+**Features**: Retry logic (2 retries), offline queue (saves unsent data to `offline_queue.json` and flushes when connection restores).
+
+---
+
+### `requirements.txt` — Python Dependencies
+Lists all Python packages needed on the Raspberry Pi:
+- `ultralytics` — YOLOv8 AI framework
+- `opencv-python` — Camera capture and image processing
+- `numpy` — Numerical operations
+- `pyserial` — GPS serial communication
+- `smbus2` — I2C communication for MPU-9250 IMU sensor
+- `RPi.GPIO` — GPIO pin control for buzzer
+- `requests` — HTTP client
+- `pynmea2` — Advanced NMEA sentence parsing (optional)
+
+---
+
+## 📂 `server/` — The Backend Server (Runs on your Laptop/PC)
+
+### `app.py` — Flask REST API Server
+**Purpose**: The central backend that receives data from all vehicles and serves it to the web dashboard.
+
+**What it does**:
+1. Runs a Flask web server on port `5000`
+2. Stores all detections in an SQLite database (`detections.db`)
+3. Provides REST API endpoints for:
+   - **Creating potholes** — with smart de-duplication (if a pothole is reported within 30m of an existing one, it **verifies** the existing one instead of creating a duplicate)
+   - **Fetching potholes** — filtered by status (active/resolved) and severity
+   - **Dashboard stats** — total count, severity breakdown, recent detections
+   - **Smart seeding** — generates realistic demo data for testing
+   - **Resolving** — marks potholes as fixed
+   - **Clearing** — wipes the database for fresh start
+4. Uses CORS to allow the web dashboard to connect from any origin
+
+### `detections.db` — SQLite Database
+**Purpose**: Stores all pothole and animal detection records. Auto-created by `app.py` on first run.
+
+**Tables**:
+- `potholes` — id, latitude, longitude, severity, confidence, description, status, vehicle_id, verification_count, timestamps
+- `imu_data` — id, latitude, longitude, accel_x, accel_y, accel_z, road_quality_score, timestamps
+
+### `requirements.txt` — Server Dependencies
+- `flask==3.1.0` — Web framework
+- `flask-cors==5.0.1` — Cross-Origin Resource Sharing support
+
+---
+
+## 📂 `website/` — The Web Dashboard (Opens in Browser)
+
+### `index.html` — Main HTML Page
+**Purpose**: The single-page dashboard structure. Contains the navbar, stats panels, map container, routing panel, pothole detail sidebar, and all UI elements.
+
+### `styles.css` — Main Stylesheet (~3000 lines)
+**Purpose**: Complete CSS design system with:
+- Dark/Light theme support using CSS variables
+- Glassmorphism effects, gradients, animations
+- Responsive layout for mobile/desktop
+- Styling for stats cards, map overlays, routing panel, autocomplete suggestions, route info panel
+
+### `app_v16.js` — Main JavaScript (~1400 lines)
+**Purpose**: The active JavaScript file that powers the entire dashboard. Contains:
+- Google Maps initialization with Advanced Markers
+- Real-time pothole data fetching from the Flask API
+- Live location tracking with GPS follow mode
+- Pothole markers with color-coded severity pins
+- Directions panel with Google Places Autocomplete
+- Route calculation with Car/Bike travel time comparison
+- Theme toggle (dark/light mode)
+- Smart Seeding demo data generation
+- Auto-refresh countdown timer
+
+### `css/sidebar-revamp.css` — Sidebar Styles
+**Purpose**: Additional styles specifically for the left-side statistics panels (stat cards, layout, responsiveness).
+
+### `app.js` and `app_v7.js` — Legacy Files
+**Purpose**: Older versions of the JavaScript. **Not actively used** — the current active file is `app_v16.js`.
+
+---
+---
+
+# Section 2 — Step-by-Step Setup Guide (From Zero)
+
+## 🛒 Part A: Hardware You Need
+
+### Components List
+| # | Component | Purpose | Approx. Cost (₹) |
+|---|---|---|---|
+| 1 | Raspberry Pi 4 (Model B 4GB RAM) | Main controller | ₹4,500 |
+| 2 | Raspberry Pi v2 Camera Module | Captures road images for AI | ₹500–1,500 |
+| 3 | UBlox NEO-M8N GPS Module with Ceramic Active Antenna | Reads real-time GPS coordinates | ₹800 |
+| 4 | MPU-9250 9DOF IMU Sensor Module (3-Axis Accelerometer, Gyroscope & Magnetometer) | Road condition monitoring & motion tracking | ₹350 |
+| 5 | Electronic Spices Active Alarm Buzzer Driver Module (3.3V–5V) | Alerts the driver with loud alarm | ₹50 |
+| 6 | HP SD Card 64GB | Stores the Raspberry Pi OS & project files | ₹450 |
+| 7 | 5V 3A Power Supply | Powers the Raspberry Pi | ₹300 |
+| 8 | Rpi Shop Raspberry Pi 4 Case Model B | Protective enclosure for the Pi | ₹250 |
+| 9 | Jumper Wires (Female-to-Female) | Connects everything | ₹50 |
+| 10 | Breadboard (optional) | Easier prototyping | ₹60 |
+
+---
+
+## 🔌 Part B: Hardware Wiring (Pin Connections)
+
+### UBlox NEO-M8N GPS Module → Raspberry Pi
+| GPS Pin | Raspberry Pi Pin | Description |
+|---|---|---|
+| **VCC** | Pin 2 (5V) | Power supply (NEO-M8N requires 5V) |
+| **GND** | Pin 6 (Ground) | Ground |
+| **TX** | Pin 10 (GPIO 15 / RXD) | GPS transmits data → Pi receives |
+| **RX** | Pin 8 (GPIO 14 / TXD) | Pi transmits → GPS receives |
+
+### MPU-9250 IMU Sensor → Raspberry Pi (I2C)
+| IMU Pin | Raspberry Pi Pin | Description |
+|---|---|---|
+| **VCC** | Pin 1 (3.3V) | Power supply (3.3V logic) |
+| **GND** | Pin 9 (Ground) | Ground |
+| **SDA** | Pin 3 (GPIO 2 / SDA) | I2C Data |
+| **SCL** | Pin 5 (GPIO 3 / SCL) | I2C Clock |
+
+### Electronic Spices Buzzer Module → Raspberry Pi
+| Buzzer Pin | Raspberry Pi Pin | Description |
+|---|---|---|
+| **VCC** | Pin 4 (5V) | Module power supply |
+| **GND** | Pin 6 (Ground) | Ground |
+| **I/O (Signal)** | Pin 12 (GPIO 18) | Control signal (BCM pin 18) |
+
+### Raspberry Pi v2 Camera
+- Connect the ribbon cable to the Camera (CSI) port on the Raspberry Pi board
+
+---
+
+## 💻 Part C: Software Setup on the Raspberry Pi
+
+### Step 1: Install Raspberry Pi OS
+1. Download [Raspberry Pi Imager](https://www.raspberrypi.com/software/) on your PC
+2. Insert the MicroSD card into your PC
+3. Open Raspberry Pi Imager → Choose OS: **Raspberry Pi OS (64-bit)**
+4. Click the ⚙️ gear icon:
+   - Set hostname: `roadguard`
+   - Enable SSH: ✅
+   - Set username: `pi`, password: `your_password`
+   - Configure WiFi: Enter your WiFi name and password
+5. Click **Write** → wait for it to finish
+6. Insert the MicroSD card into the Raspberry Pi and power it on
+
+### Step 2: Enable Interfaces
+1. Open a terminal on the Pi (or SSH into it: `ssh pi@roadguard.local`)
+2. Run:
+   ```bash
+   sudo raspi-config
+   ```
+3. Go to **Interface Options** and enable:
+   - ✅ **Camera** (for Pi Camera v2)
+   - ✅ **I2C** (for MPU-9250 IMU sensor)
+   - ✅ **Serial Port** — say "No" to login shell, say "Yes" to hardware serial
+4. Reboot:
+   ```bash
+   sudo reboot
+   ```
+
+### Step 3: Copy Project Files to the Raspberry Pi
+From your PC, copy the `raspberry_pi/` folder to the Pi:
+
+**Option A — Using USB Drive:**
+1. Copy the entire `raspberry_pi/` folder onto a USB drive
+2. Plug it into the Raspberry Pi
+3. Open the file manager, copy the folder to `/home/pi/roadguard/`
+
+**Option B — Using SCP (from your PC terminal):**
+```bash
+scp -r "C:\Users\DELL\OneDrive\Desktop\Pothole\raspberry_pi\*" pi@roadguard.local:/home/pi/roadguard/
+```
+
+### Step 4: Install Python Dependencies
+On the Raspberry Pi terminal:
+```bash
+cd /home/pi/roadguard
+pip install -r requirements.txt
+```
+
+> **Note**: `ultralytics` (YOLOv8) is a large package and may take 10–15 minutes to install on a Raspberry Pi.
+
+### Step 5: Download the YOLOv8 Model
+The first time you run the system, it will auto-download `yolov8n.pt` (~6MB). Or you can pre-download it:
+```bash
+cd /home/pi/roadguard
+python -c "from ultralytics import YOLO; YOLO('yolov8n.pt')"
+```
+
+> **Important**: The default `yolov8n.pt` is a general-purpose model. For best pothole detection, you should train a custom model on pothole images and replace the `.pt` file.
+
+### Step 6: Edit the Configuration
+Open `config.py` and change:
+```python
+API_BASE_URL = "http://YOUR_LAPTOP_IP:5000/api"
+```
+Replace `YOUR_LAPTOP_IP` with the actual IP address of the laptop running the Flask server (e.g., `192.168.1.5`).
+
+To find your laptop's IP:
+- **Windows**: Open CMD → type `ipconfig` → look for "IPv4 Address" under your WiFi adapter
+- Both Pi and Laptop must be on the **same WiFi network**
+
+---
+
+## 💻 Part D: Software Setup on Your Laptop (Server + Dashboard)
+
+### Step 1: Install Python 3
+Download and install [Python 3.10+](https://www.python.org/downloads/) if not already installed.
+
+### Step 2: Install Server Dependencies
+Open a terminal/command prompt:
+```bash
+cd "C:\Users\DELL\OneDrive\Desktop\Pothole\server"
+pip install -r requirements.txt
+```
+
+### Step 3: Start the Flask Server
+```bash
+cd "C:\Users\DELL\OneDrive\Desktop\Pothole\server"
+python app.py
+```
+You should see:
+```
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.x.x:5000
+```
+
+### Step 4: Start the Website (Dashboard)
+Open a **second** terminal:
+```bash
+cd "C:\Users\DELL\OneDrive\Desktop\Pothole\website"
+python -m http.server 8000
+```
+
+### Step 5: Open the Dashboard
+Open your browser and navigate to:
+```
+http://localhost:8000
+```
+You should see the RoadGuard dashboard with a Google Map!
+
+---
+
+## 🔑 Part E: Google Maps API Key Setup
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project (or select an existing one)
+3. Go to **APIs & Services → Library** and enable:
+   - ✅ Maps JavaScript API
+   - ✅ Places API
+   - ✅ Directions API
+   - ✅ Routes API
+   - ✅ Geocoding API
+4. Go to **APIs & Services → Credentials**
+5. Click **Create Credentials → API Key**
+6. Copy the API key
+7. Open `website/index.html`, find the line near the bottom:
+   ```javascript
+   key: "AIzaSyAs7evwNLyKLaBI_03MoxFhCHY3MCmTZWo",
+   ```
+   Replace this with your new API key.
+
+> **Important**: You **must** link a Billing Account to your Google Cloud project. The Directions API requires it even on the free tier. Google gives $200/month of free usage credits.
+
+---
+---
+
+# Section 3 — How Everything Works
+
+## 🏗️ System Architecture Overview
+
+```
+┌────────────────────────────┐
+│   RASPBERRY PI (In Car)    │
+│                            │
+│  Camera → YOLOv8 AI ──┐   │
+│  GPS Module ───────────┤   │
+│  IMU Sensor (MPU-9250)─┤   │
+│  Buzzer (Alerts) ◄─────┘   │
+│         │                  │
+│    API Client              │
+│         │                  │
+└─────────┼──────────────────┘
+          │ HTTP (WiFi)
+          ▼
+┌────────────────────────────┐
+│   FLASK SERVER (Laptop)    │
+│                            │
+│  REST API ←→ SQLite DB     │
+│  Port 5000                 │
+│         │                  │
+└─────────┼──────────────────┘
+          │ HTTP
+          ▼
+┌────────────────────────────┐
+│   WEB DASHBOARD (Browser)  │
+│                            │
+│  Google Maps + Live Data   │
+│  Port 8000                 │
+└────────────────────────────┘
+```
+
+---
+
+## 🔄 Detection Flow (Step by Step)
+
+### 1. Continuous Capture (Every 0.5 seconds)
+- The Pi v2 camera captures a 640×480 image of the road ahead
+- The NEO-M8N GPS module reads the current latitude, longitude, and speed
+- The MPU-9250 IMU reads accelerometer, gyroscope, and magnetometer data
+- All readings are timestamped
+
+### 2. AI Analysis
+- The captured frame is fed into **YOLOv8** (a neural network)
+- YOLOv8 scans the image and outputs bounding boxes around detected objects
+- If any box is classified as "pothole" with confidence ≥50%, it's accepted
+- The pothole's **severity** is calculated based on how large the detection is relative to the frame
+- IMU data supplements visual detection — sudden accelerometer spikes help confirm rough road surfaces
+
+### 3. Collaborative Verification
+This is the intelligent part of the system:
+
+- **New pothole**: The API client sends the GPS coordinates + severity to the server. The server checks if any pothole already exists within 30 meters. If not, it creates a new record.
+- **Verification**: If the server finds an existing pothole nearby, it increments the `verification_count`. More verifications = higher confidence the pothole is real.
+- **Resolution**: If the car drives past a known pothole location but the camera does NOT see a pothole, the system marks it as "potentially resolved" (the pothole has been fixed).
+
+### 4. Driver Alerts
+- When a pothole is detected → buzzer plays **triple quick beep** ⚡⚡⚡
+- When rough road conditions are detected via IMU → buzzer plays **double long beep** 🔔🔔
+- Alerts have a 3-second cooldown to prevent spam
+
+### 5. IMU Road Condition Monitoring (Continuous)
+- The MPU-9250 continuously reads 9-axis motion data
+- Accelerometer data detects sudden bumps, vibrations, and road irregularities
+- Gyroscope data detects vehicle tilting from uneven road surfaces
+- Magnetometer provides heading information for navigation support
+- Road quality scores are computed and sent to the server for dashboard display
+
+### 6. Dashboard Display
+- The web dashboard polls the Flask server every 60 seconds (auto-refresh)
+- Google Maps displays color-coded markers:
+  - 🔴 Red = Critical severity
+  - 🟠 Orange = High severity
+  - 🟡 Yellow = Medium severity
+  - 🟢 Green = Low severity
+- Clicking a marker shows details: severity, confidence, GPS coordinates, reporter
+- The directions panel lets you search routes between two locations
+- Route info panel shows estimated travel time for Car 🚗 and Bike 🏍️
+
+---
+
+## 🚗 How to Operate the Device
+
+### Starting Up
+1. **Power on the Raspberry Pi** inside the car (connect to 5V car USB or power bank)
+2. **Start the Flask server** on your laptop:
+   ```bash
+   cd server
+   python app.py
+   ```
+3. **Start the website server** (second terminal):
+   ```bash
+   cd website
+   python -m http.server 8000
+   ```
+4. **SSH into the Pi** from your laptop and start the detection:
+   ```bash
+   ssh pi@roadguard.local
+   cd /home/pi/roadguard
+   python main.py
+   ```
+5. **Open the dashboard** in your browser: `http://localhost:8000`
+
+### While Driving
+- The system runs **completely automatically** — no human interaction needed
+- The camera continuously scans the road
+- The buzzer alerts you when a pothole or animal is ahead
+- All data is sent to the server in real-time over WiFi
+- The dashboard updates automatically
+
+### Stopping
+- On the Pi: press `Ctrl+C` to stop `main.py` — it will gracefully shut down all hardware
+- On your laptop: press `Ctrl+C` in both terminal windows
+
+### Troubleshooting
+| Issue | Solution |
+|---|---|
+| "GPS no fix" | Make sure the NEO-M8N GPS module has a clear view of the sky. It takes 30–90 seconds for first fix. |
+| Camera not detected | Run `vcgencmd get_camera` to check. Ensure the Pi v2 Camera ribbon cable is fully inserted into the CSI port. |
+| Server connection failed | Ensure Pi and laptop are on the same WiFi. Check the `API_BASE_URL` in `config.py`. |
+| Buzzer not working | Check wiring: positive to GPIO 18, negative to GND. Test with `python buzzer.py`. |
+| IMU sensor error | Run `sudo i2cdetect -y 1` to check if MPU-9250 is visible at address 0x68. |
+| "Directions request failed" | Enable the Directions API in your Google Cloud Console and link a billing account. |
+
+---
+
+## 📊 API Reference (Server Endpoints)
+
+| Method | URL | Description |
+|---|---|---|
+| `POST` | `/api/pothole` | Report or verify a pothole |
+| `GET` | `/api/pothole` | Get all potholes (filter: `?status=active&severity=high`) |
+| `GET` | `/api/pothole/nearby?lat=...&lng=...&radius=150` | Get potholes near a GPS point |
+| `POST` | `/api/pothole/<id>/verify` | Verify an existing pothole |
+| `POST` | `/api/pothole/<id>/resolve` | Mark a pothole as resolved |
+| `GET` | `/api/stats` | Get dashboard statistics |
+| `POST` | `/api/seed` | Generate demo data for testing |
+| `POST` | `/api/clear` | Wipe the entire database |
+| `GET` | `/api/health` | Server health check |
+
+---
+
+## ❓ Frequently Asked Questions (FAQ)
+
+### What power source is required to run the RoadGuard system in a vehicle?
+To run this RoadGuard system (specifically the Raspberry Pi 4/5) and all connected hardware peripherals during heavy 30 FPS YOLO inference, you need a power supply capable of providing **at least 5 Volts at 3 Amps (15 Watts)**. 
+
+**How to Power It:**
+1. **Car USB Charger:** Use a high-quality USB-C car adapter plugged into your 12V cigarette lighter. It MUST be rated for Fast Charge or Power Delivery (3 Amps+). The system will power off when the car does.
+2. **High-Capacity Power Bank:** Connect the Pi to a USB-C power bank rated for `5V / 3A` output. A standard 10,000 mAh battery will roughly run the detection script for 3 to 4 hours.
+
+### Can I use my laptop (e.g. Dell G15) to power the Raspberry Pi while coding and transferring files?
+Yes, but with limitations. You can power the Pi by connecting a USB-C cable from your Dell G15 to the Pi's power port. This is standard for development.
+
+**How it works (Headless Setup):**
+1. **Power:** The laptop provides power via USB-C. (Note: Laptop USB ports often supply ~0.9A to 1.5A. Under heavy YOLO load, this may trigger under-voltage warnings or cause the Pi to throttle or reboot. A wall adapter is recommended for actual running).
+2. **Network/Control:** Connect an Ethernet cable between your Dell G15 and the Pi, or connect both to the same Wi-Fi network. 
+3. **Coding:** You communicate with the Pi via SSH (`ssh pi@<PI_IP_ADDRESS>`) using Command Prompt/PowerShell on your laptop, or via VS Code's "Remote - SSH" extension. The code and OS run *on* the Pi, but you view and edit them via your laptop screen.
+
+---
+
+*This document covers the complete RoadGuard system. For questions or contributions, refer to the source code comments in each file.*

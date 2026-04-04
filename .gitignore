@@ -1,0 +1,15 @@
+# Datasets and Notebook files
+Pothole-Detection--1/
+*.zip
+
+# ML Weights & Outputs
+runs/
+*.pt
+
+# Python caches
+__pycache__/
+*.pyc
+
+# Local environments
+node_modules/
+.env

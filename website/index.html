@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoadGuard — Real-Time Pothole Intelligence</title>
+    <meta name="description"
+        content="Real-time pothole detection dashboard with GPS tracking, severity analysis, and live road mapping.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Nunito:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=10.7">
+    <link rel="stylesheet" href="css/sidebar-revamp.css?v=12">
+</head>
+
+<body>
+    <!-- Animated background particles -->
+    <div class="particles" id="particles" aria-hidden="true"></div>
+
+    <!-- ─── Header (Floating Pill) ──────────────────────────────── -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo-wrap">
+                <div class="logo-circle">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                </div>
+                <h1 class="nav-brand">RoadGuard</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="header-actions">
+                <button class="btn-theme-circle" id="refreshBtn" title="Refresh data now">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <path d="M23 4v6h-6" />
+                        <path d="M1 20v-6h6" />
+                        <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+                    </svg>
+                </button>
+            </div>
+            <button class="btn-theme-circle" id="themeToggle" title="Toggle Theme">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- ─── Main Layout ─────────────────────────────────────────── -->
+    <main class="main-layout">
+
+        <!-- ─── Left Sidebar (Two Panels) ───────────────────── -->
+        <aside class="sidebar" id="sidebar">
+
+            <!-- ═══ UPPER PANEL: Stats & Data ═══ -->
+            <div class="panel panel-upper anim-blow-up">
+                <!-- Row 1: Active Potholes | Resolved | Safety Grade -->
+                <div class="stats-row">
+                    <div class="stat-chip anim-fade-in-up anim-delay-1">
+                        <span class="chip-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path
+                                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" />
+                            </svg>
+                        </span>
+                        <div class="chip-data">
+                            <span class="chip-value" id="totalPotholes">0</span>
+                            <span class="chip-label">Active</span>
+                        </div>
+                    </div>
+                    <div class="stat-chip anim-fade-in-up anim-delay-2">
+                        <span class="chip-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </span>
+                        <div class="chip-data">
+                            <span class="chip-value" id="resolvedPotholes">0</span>
+                            <span class="chip-label">Resolved</span>
+                        </div>
+                    </div>
+                    <div class="stat-chip grade-chip anim-fade-in-up anim-delay-3">
+                        <div class="grade-circle-sm" id="safetyGradeCircle" data-grade="A">A</div>
+                        <div class="chip-data">
+                            <span class="chip-label">Safety</span>
+                            <span class="chip-sublabel" id="safetyGradeDesc">Safe</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 2: Weather Conditions (MET Norway) -->
+                <div class="weather-box anim-fade-in-up anim-delay-4">
+                    <div class="weather-row">
+                        <span class="weather-icon-sm" id="weatherIcon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="5"></circle>
+                                <line x1="12" y1="1" x2="12" y2="3"></line>
+                                <line x1="12" y1="21" x2="12" y2="23"></line>
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                <line x1="1" y1="12" x2="3" y2="12"></line>
+                                <line x1="21" y1="12" x2="23" y2="12"></line>
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                            </svg>
+                        </span>
+                        <span class="weather-temp-sm" id="weatherTemp">--°C</span>
+                        <span class="weather-condition" id="weatherDesc">Loading…</span>
+                    </div>
+                    <div class="road-status" id="roadStatus">
+                        <span class="road-dot"></span>
+                        <span id="roadConditionText">Checking conditions…</span>
+                    </div>
+                </div>
+
+                <!-- Row 3: Severity Index -->
+                <div class="severity-box anim-fade-in-up anim-delay-5">
+                    <h4 class="sev-title">Severity Index</h4>
+                    <div class="sev-grid">
+                        <div class="sev-item sev-critical">
+                            <span class="sev-dot" id="vBarCritical"></span>
+                            <span class="sev-count" id="countCritical">0</span>
+                            <span class="sev-name">Critical</span>
+                        </div>
+                        <div class="sev-item sev-high">
+                            <span class="sev-dot" id="vBarHigh"></span>
+                            <span class="sev-count" id="countHigh">0</span>
+                            <span class="sev-name">High</span>
+                        </div>
+                        <div class="sev-item sev-medium">
+                            <span class="sev-dot" id="vBarMedium"></span>
+                            <span class="sev-count" id="countMedium">0</span>
+                            <span class="sev-name">Medium</span>
+                        </div>
+                        <div class="sev-item sev-low">
+                            <span class="sev-dot" id="vBarLow"></span>
+                            <span class="sev-count" id="countLow">0</span>
+                            <span class="sev-name">Low</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ LOWER PANEL: Global Feed ═══ -->
+            <div class="panel panel-lower anim-blow-up anim-delay-2">
+                <h3 class="panel-title">
+                    <span class="panel-title-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z">
+                            </path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                    </span>
+                    Global Feed
+                </h3>
+                <div class="detection-feed" id="detectionFeed">
+                    <div class="feed-empty">
+                        <div class="feed-empty-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path
+                                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" />
+                            </svg>
+                        </div>
+                        <p>No hazards detected</p>
+                        <p class="feed-hint">Waiting for data or click Smart Seed</p>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- ─── Map Container ─────────────────────────────────── -->
+        <div class="map-container">
+            <div id="map" class="map"></div>
+
+
+            <!-- Live Location Action Button -->
+            <button id="liveLocationBtn" class="live-location-btn pulse-high" aria-label="Follow Current Location">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 2v2"></path>
+                    <path d="M12 20v2"></path>
+                    <path d="M20 12h2"></path>
+                    <path d="M2 12h2"></path>
+                    <circle cx="12" cy="12" r="7"></circle>
+                </svg>
+            </button>
+
+            <!-- Shortest Route / Directions Panel -->
+            <div class="routing-panel" id="routingPanel">
+                <div class="route-row">
+                    <span class="route-label">
+                        <span class="input-icon origin-icon">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                            </svg>
+                        </span>
+                        From
+                    </span>
+                    <div class="route-input-wrapper">
+                        <input type="text" id="routeOrigin" placeholder="Origin (Leave blank for gps)"
+                            class="route-input" autocomplete="off">
+                        <div class="route-suggestions" id="originSuggestions"></div>
+                    </div>
+                </div>
+
+                <div class="route-row">
+                    <span class="route-label">
+                        <span class="input-icon dest-icon">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                            </svg>
+                        </span>
+                        To
+                    </span>
+                    <div class="route-input-wrapper">
+                        <input type="text" id="routeDest" placeholder="Destination" class="route-input"
+                            autocomplete="off">
+                        <button class="btn-route-arrow pulse-high" id="getRouteBtn" aria-label="Get Directions">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <path d="M5 12h14M12 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                        <div class="route-suggestions" id="destSuggestions"></div>
+                    </div>
+                </div>
+
+                <!-- Route Info Panel (appears after route is calculated) -->
+                <div class="route-info-panel" id="routeInfoPanel">
+                    <div class="route-info-modes" id="routeInfoModes">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Radar Sweep Overlay -->
+            <div class="radar-container" id="radarContainer">
+                <div class="radar-sweep"></div>
+                <div class="radar-center"></div>
+                <div class="radar-rings">
+                    <div class="radar-ring r1"></div>
+                    <div class="radar-ring r2"></div>
+                    <div class="radar-ring r3"></div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Toast -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Pothole Detail Sidebar -->
+    <div class="pothole-sidebar" id="potholeSidebar">
+        <div class="ps-header">
+            <div class="ps-title-row">
+                <span class="ps-icon" id="psSeverityIcon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                </span>
+                <div>
+                    <h2 class="ps-title">Pothole Report</h2>
+                    <div class="ps-id" id="psId">#—</div>
+                </div>
+            </div>
+            <button class="ps-close" id="closeSidebar" title="Close">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="ps-status-banner" id="psStatusBanner">
+            <span class="ps-status-dot" id="psStatusDot"></span>
+            <span id="psStatusText">Active</span>
+        </div>
+        <div class="ps-section">
+            <div class="ps-label">Threat Level</div>
+            <div class="ps-threat">
+                <span class="ps-threat-bar-wrap"><span class="ps-threat-bar" id="psThreatBar"></span></span>
+                <span class="ps-threat-text" id="psThreatText">Medium</span>
+            </div>
+        </div>
+        <div class="ps-section">
+            <div class="ps-label">Estimated Size</div>
+            <div class="ps-row"><span class="ps-value" id="psSize">—</span><span class="ps-unit"
+                    id="psSizeLabel"></span></div>
+        </div>
+        <div class="ps-section">
+            <div class="ps-label">First Detected</div>
+            <div class="ps-value" id="psDetectedAt">—</div>
+        </div>
+        <div class="ps-section">
+            <div class="ps-label">Last Verified</div>
+            <div class="ps-value" id="psLastVerified">—</div>
+        </div>
+        <div class="ps-section">
+            <div class="ps-label">Confirmations</div>
+            <div class="ps-value" id="psVerifiedCount">1 vehicle</div>
+        </div>
+        <div class="ps-section">
+            <div class="ps-label">Reported By</div>
+            <div class="ps-value" id="psReportedBy">—</div>
+        </div>
+        <div class="ps-section">
+            <div class="ps-label">GPS Coordinates</div>
+            <div class="ps-coords" id="psCoords">—</div>
+        </div>
+        <div class="ps-section">
+            <div class="ps-label">Detection Confidence</div>
+            <div class="ps-confidence-wrap">
+                <div class="ps-confidence-bar-bg">
+                    <div class="ps-confidence-bar" id="psConfBar"></div>
+                </div>
+                <span id="psConfVal">—</span>
+            </div>
+        </div>
+    </div>
+    <div class="ps-overlay" id="psOverlay"></div>
+
+
+
+    <!-- Google Maps API with Places -->
+    <script>
+        (g => { var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => { await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a) })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)) })({
+            key: "AIzaSyAs7evwNLyKLaBI_03MoxFhCHY3MCmTZWo",
+            v: "weekly",
+            libraries: "places"
+        });
+    </script>
+    <script src="app_v16.js?v=114"></script>
+</body>
+
+</html>
