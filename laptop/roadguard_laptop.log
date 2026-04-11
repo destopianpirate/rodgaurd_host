@@ -1220,3 +1220,321 @@
 2026-04-03 22:02:33,232 [INFO] gps_reader: GPS disconnected
 2026-04-03 22:02:33,233 [INFO] RoadGuardLaptop: Goodbye! 👋
 
+2026-04-06 16:11:01,200 [INFO] RoadGuardLaptop: ============================================================
+2026-04-06 16:11:01,201 [INFO] RoadGuardLaptop:   RoadGuard Laptop Setup — Collaborative Verification
+2026-04-06 16:11:01,202 [INFO] RoadGuardLaptop:   Vehicle ID: laptop-001
+2026-04-06 16:11:01,202 [INFO] RoadGuardLaptop: ============================================================
+2026-04-06 16:11:06,976 [INFO] RoadGuardLaptop: 📷 WebCam: ✅ (640x480)
+2026-04-06 16:11:07,108 [INFO] pothole_detector: YOLO model loaded: C:\Users\DELL\OneDrive\Desktop\IITGN.AI\Pothole\runs\detect\pothole_blur_augmented2\weights\best.pt
+2026-04-06 16:11:07,108 [INFO] pothole_detector: Model classes: {0: 'Drain Hole', 1: 'circle-drain-clean-', 2: 'drain-clean-', 3: 'drain-not clean-', 4: 'hole', 5: 'manhole', 6: 'pothole', 7: 'sewer cover'}
+2026-04-06 16:11:07,108 [INFO] RoadGuardLaptop: 🕳️  Detector: ✅
+2026-04-06 16:11:07,109 [WARNING] thermal_detector: MLX90640 not available — running in simulation mode
+2026-04-06 16:11:07,109 [INFO] RoadGuardLaptop: 🌡️  Thermal: ⚠️ Sim mode
+2026-04-06 16:11:07,110 [INFO] gps_reader: GPS (IP Geolocation) initialized
+2026-04-06 16:11:07,549 [INFO] gps_reader: Loaded IP Geolocation: 23.2167, 72.6833
+2026-04-06 16:11:07,550 [INFO] RoadGuardLaptop: 📍 GPS (IP Geolocation): ✅
+2026-04-06 16:11:07,551 [INFO] buzzer: Buzzer initialized on Windows speaker
+2026-04-06 16:11:09,594 [INFO] RoadGuardLaptop: 🌐 Server: ⚠️ Offline (Will Queue)
+2026-04-06 16:11:09,595 [INFO] RoadGuardLaptop: ------------------------------------------------------------
+2026-04-06 16:11:09,595 [INFO] RoadGuardLaptop: 💻 Running on Laptop. Press Ctrl+C to stop.
+
+2026-04-06 16:11:13,487 [INFO] pothole_detector: Detected 1 pothole(s): ['medium']
+2026-04-06 16:11:15,533 [WARNING] api_client: Connection error (attempt 1/2)
+2026-04-06 16:11:18,049 [WARNING] api_client: Connection error (attempt 2/2)
+2026-04-06 16:11:18,049 [WARNING] api_client: ⚠️ Queueing offline: potholes
+2026-04-06 16:11:18,052 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 16:11:18,052 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=medium conf=71%
+2026-04-06 16:11:20,731 [INFO] pothole_detector: Detected 1 pothole(s): ['high']
+2026-04-06 16:11:22,763 [WARNING] api_client: Connection error (attempt 1/2)
+2026-04-06 16:11:25,296 [WARNING] api_client: Connection error (attempt 2/2)
+2026-04-06 16:11:25,297 [WARNING] api_client: ⚠️ Queueing offline: potholes
+2026-04-06 16:11:25,299 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 16:11:25,300 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=high conf=66%
+2026-04-06 16:11:29,598 [INFO] pothole_detector: Detected 1 pothole(s): ['medium']
+2026-04-06 16:11:31,636 [WARNING] api_client: Connection error (attempt 1/2)
+2026-04-06 16:11:34,191 [WARNING] api_client: Connection error (attempt 2/2)
+2026-04-06 16:11:34,192 [WARNING] api_client: ⚠️ Queueing offline: potholes
+2026-04-06 16:11:34,194 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 16:11:34,195 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=medium conf=62%
+2026-04-06 16:11:36,355 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 16:11:38,391 [WARNING] api_client: Connection error (attempt 1/2)
+2026-04-06 16:11:40,915 [WARNING] api_client: Connection error (attempt 2/2)
+2026-04-06 16:11:40,915 [WARNING] api_client: ⚠️ Queueing offline: potholes
+2026-04-06 16:11:40,919 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 16:11:40,919 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=54%
+2026-04-06 16:11:45,470 [INFO] RoadGuardLaptop: Shutdown signal received...
+2026-04-06 16:11:45,528 [INFO] RoadGuardLaptop: 
+🛑 Shutting down RoadGuard Laptop...
+2026-04-06 16:11:45,882 [INFO] gps_reader: GPS disconnected
+2026-04-06 16:11:45,883 [INFO] RoadGuardLaptop: Goodbye! 👋
+
+2026-04-06 16:12:54,143 [INFO] RoadGuardLaptop: ============================================================
+2026-04-06 16:12:54,144 [INFO] RoadGuardLaptop:   RoadGuard Laptop Setup — Collaborative Verification
+2026-04-06 16:12:54,144 [INFO] RoadGuardLaptop:   Vehicle ID: laptop-001
+2026-04-06 16:12:54,145 [INFO] RoadGuardLaptop: ============================================================
+2026-04-06 16:13:00,189 [INFO] RoadGuardLaptop: 📷 WebCam: ✅ (640x480)
+2026-04-06 16:13:00,303 [INFO] pothole_detector: YOLO model loaded: C:\Users\DELL\OneDrive\Desktop\IITGN.AI\Pothole\runs\detect\pothole_blur_augmented2\weights\best.pt
+2026-04-06 16:13:00,304 [INFO] pothole_detector: Model classes: {0: 'Drain Hole', 1: 'circle-drain-clean-', 2: 'drain-clean-', 3: 'drain-not clean-', 4: 'hole', 5: 'manhole', 6: 'pothole', 7: 'sewer cover'}
+2026-04-06 16:13:00,305 [INFO] RoadGuardLaptop: 🕳️  Detector: ✅
+2026-04-06 16:13:00,305 [WARNING] thermal_detector: MLX90640 not available — running in simulation mode
+2026-04-06 16:13:00,305 [INFO] RoadGuardLaptop: 🌡️  Thermal: ⚠️ Sim mode
+2026-04-06 16:13:00,305 [INFO] gps_reader: GPS (IP Geolocation) initialized
+2026-04-06 16:13:00,717 [INFO] gps_reader: Loaded IP Geolocation: 23.2167, 72.6833
+2026-04-06 16:13:00,717 [INFO] RoadGuardLaptop: 📍 GPS (IP Geolocation): ✅
+2026-04-06 16:13:00,718 [INFO] buzzer: Buzzer initialized on Windows speaker
+2026-04-06 16:13:00,719 [INFO] api_client: Loaded 4 items from offline queue
+2026-04-06 16:13:02,784 [INFO] RoadGuardLaptop: 🌐 Server: ⚠️ Offline (Will Queue)
+2026-04-06 16:13:02,784 [INFO] RoadGuardLaptop: ------------------------------------------------------------
+2026-04-06 16:13:02,785 [INFO] RoadGuardLaptop: 💻 Running on Laptop. Press Ctrl+C to stop.
+
+2026-04-06 16:13:05,806 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 16:13:07,901 [WARNING] api_client: Connection error (attempt 1/2)
+2026-04-06 16:13:10,461 [WARNING] api_client: Connection error (attempt 2/2)
+2026-04-06 16:13:10,462 [WARNING] api_client: ⚠️ Queueing offline: potholes
+2026-04-06 16:13:10,466 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 16:13:10,467 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=86%
+2026-04-06 16:13:15,004 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 16:13:17,040 [WARNING] api_client: Connection error (attempt 1/2)
+2026-04-06 16:13:19,564 [WARNING] api_client: Connection error (attempt 2/2)
+2026-04-06 16:13:19,565 [WARNING] api_client: ⚠️ Queueing offline: potholes
+2026-04-06 16:13:19,568 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 16:13:19,568 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=77%
+2026-04-06 16:13:23,344 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 16:13:25,395 [WARNING] api_client: Connection error (attempt 1/2)
+2026-04-06 16:13:27,934 [WARNING] api_client: Connection error (attempt 2/2)
+2026-04-06 16:13:27,935 [WARNING] api_client: ⚠️ Queueing offline: potholes
+2026-04-06 16:13:27,938 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 16:13:27,939 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=60%
+2026-04-06 16:13:31,523 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 16:13:33,557 [WARNING] api_client: Connection error (attempt 1/2)
+2026-04-06 16:13:36,066 [WARNING] api_client: Connection error (attempt 2/2)
+2026-04-06 16:13:36,067 [WARNING] api_client: ⚠️ Queueing offline: potholes
+2026-04-06 16:13:36,071 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 16:13:36,072 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=63%
+2026-04-06 16:13:39,769 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 16:13:41,805 [WARNING] api_client: Connection error (attempt 1/2)
+2026-04-06 16:13:44,330 [WARNING] api_client: Connection error (attempt 2/2)
+2026-04-06 16:13:44,331 [WARNING] api_client: ⚠️ Queueing offline: potholes
+2026-04-06 16:13:44,335 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 16:13:44,335 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=78%
+2026-04-06 16:13:51,875 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 16:13:53,908 [WARNING] api_client: Connection error (attempt 1/2)
+2026-04-06 16:13:56,458 [WARNING] api_client: Connection error (attempt 2/2)
+2026-04-06 16:13:56,458 [WARNING] api_client: ⚠️ Queueing offline: potholes
+2026-04-06 16:13:56,462 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 16:13:56,463 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=55%
+2026-04-06 16:13:59,795 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 16:14:01,830 [WARNING] api_client: Connection error (attempt 1/2)
+2026-04-06 16:14:04,370 [WARNING] api_client: Connection error (attempt 2/2)
+2026-04-06 16:14:04,370 [WARNING] api_client: ⚠️ Queueing offline: potholes
+2026-04-06 16:14:04,374 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 16:14:04,375 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=80%
+2026-04-06 16:14:19,528 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 16:14:21,599 [WARNING] api_client: Connection error (attempt 1/2)
+2026-04-06 16:14:24,145 [WARNING] api_client: Connection error (attempt 2/2)
+2026-04-06 16:14:24,146 [WARNING] api_client: ⚠️ Queueing offline: potholes
+2026-04-06 16:14:24,150 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 16:14:24,151 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=56%
+2026-04-06 16:14:38,021 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 16:14:40,052 [WARNING] api_client: Connection error (attempt 1/2)
+2026-04-06 16:14:42,594 [WARNING] api_client: Connection error (attempt 2/2)
+2026-04-06 16:14:42,594 [WARNING] api_client: ⚠️ Queueing offline: potholes
+2026-04-06 16:14:42,600 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 16:14:42,600 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=59%
+2026-04-06 16:14:50,615 [INFO] pothole_detector: Detected 1 pothole(s): ['high']
+2026-04-06 16:14:52,661 [WARNING] api_client: Connection error (attempt 1/2)
+2026-04-06 16:14:55,202 [WARNING] api_client: Connection error (attempt 2/2)
+2026-04-06 16:14:55,203 [WARNING] api_client: ⚠️ Queueing offline: potholes
+2026-04-06 16:14:55,208 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 16:14:55,209 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=high conf=84%
+2026-04-06 16:15:02,270 [INFO] RoadGuardLaptop: Shutdown signal received...
+2026-04-06 16:15:02,424 [INFO] RoadGuardLaptop: 
+🛑 Shutting down RoadGuard Laptop...
+2026-04-06 16:15:02,797 [INFO] gps_reader: GPS disconnected
+2026-04-06 16:15:02,798 [INFO] RoadGuardLaptop: Goodbye! 👋
+
+2026-04-06 16:20:18,806 [INFO] RoadGuardLaptop: ============================================================
+2026-04-06 16:20:18,807 [INFO] RoadGuardLaptop:   RoadGuard Laptop Setup — Collaborative Verification
+2026-04-06 16:20:18,807 [INFO] RoadGuardLaptop:   Vehicle ID: laptop-001
+2026-04-06 16:20:18,808 [INFO] RoadGuardLaptop: ============================================================
+2026-04-06 16:20:25,829 [INFO] RoadGuardLaptop: 📷 WebCam: ✅ (640x480)
+2026-04-06 16:20:25,976 [INFO] pothole_detector: YOLO model loaded: C:\Users\DELL\OneDrive\Desktop\IITGN.AI\Pothole\runs\detect\pothole_blur_augmented2\weights\best.pt
+2026-04-06 16:20:25,976 [INFO] pothole_detector: Model classes: {0: 'Drain Hole', 1: 'circle-drain-clean-', 2: 'drain-clean-', 3: 'drain-not clean-', 4: 'hole', 5: 'manhole', 6: 'pothole', 7: 'sewer cover'}
+2026-04-06 16:20:25,977 [INFO] RoadGuardLaptop: 🕳️  Detector: ✅
+2026-04-06 16:20:25,977 [WARNING] thermal_detector: MLX90640 not available — running in simulation mode
+2026-04-06 16:20:25,977 [INFO] RoadGuardLaptop: 🌡️  Thermal: ⚠️ Sim mode
+2026-04-06 16:20:25,977 [INFO] gps_reader: GPS (IP Geolocation) initialized
+2026-04-06 16:20:26,410 [INFO] gps_reader: Loaded IP Geolocation: 23.2167, 72.6833
+2026-04-06 16:20:26,411 [INFO] RoadGuardLaptop: 📍 GPS (IP Geolocation): ✅
+2026-04-06 16:20:26,412 [INFO] buzzer: Buzzer initialized on Windows speaker
+2026-04-06 16:20:26,415 [INFO] api_client: Loaded 14 items from offline queue
+2026-04-06 16:20:26,427 [INFO] RoadGuardLaptop: 🌐 Server: ✅ Connected
+2026-04-06 16:20:26,428 [INFO] RoadGuardLaptop: ------------------------------------------------------------
+2026-04-06 16:20:26,428 [INFO] RoadGuardLaptop: 💻 Running on Laptop. Press Ctrl+C to stop.
+
+2026-04-06 16:20:30,692 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 16:20:30,742 [INFO] api_client: ✅ potholes: verified — ok
+2026-04-06 16:20:31,340 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 16:20:31,340 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=80%
+2026-04-06 16:20:36,203 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 16:20:36,234 [INFO] api_client: ✅ potholes: created — ok
+2026-04-06 16:20:36,236 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 16:20:36,236 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=83%
+2026-04-06 16:20:40,788 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 16:20:40,841 [INFO] api_client: ✅ potholes: verified — ok
+2026-04-06 16:20:40,855 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 16:20:40,855 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=57%
+2026-04-06 16:20:43,285 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 16:20:43,322 [INFO] api_client: ✅ potholes: verified — ok
+2026-04-06 16:20:43,322 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=85%
+2026-04-06 16:20:45,759 [INFO] pothole_detector: Detected 2 pothole(s): ['medium', 'low']
+2026-04-06 16:20:45,859 [INFO] api_client: ✅ potholes: created — ok
+2026-04-06 16:20:45,873 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 16:20:45,874 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=medium conf=77%
+2026-04-06 16:20:45,932 [INFO] api_client: ✅ potholes: verified — ok
+2026-04-06 16:20:45,935 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=71%
+2026-04-06 16:20:52,393 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 16:20:52,429 [INFO] api_client: ✅ potholes: created — ok
+2026-04-06 16:20:52,432 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 16:20:52,432 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=68%
+2026-04-06 16:20:56,577 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 16:20:56,615 [INFO] api_client: ✅ potholes: verified — ok
+2026-04-06 16:20:56,620 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 16:20:56,620 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=88%
+2026-04-06 16:21:37,793 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 16:21:37,837 [INFO] api_client: ✅ potholes: created — ok
+2026-04-06 16:21:37,842 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 16:21:37,843 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=65%
+2026-04-06 16:23:59,701 [INFO] RoadGuardLaptop: Shutdown signal received...
+2026-04-06 16:23:59,702 [INFO] RoadGuardLaptop: 
+🛑 Shutting down RoadGuard Laptop...
+2026-04-06 16:23:59,761 [INFO] gps_reader: GPS disconnected
+2026-04-06 16:23:59,761 [INFO] RoadGuardLaptop: Goodbye! 👋
+
+2026-04-06 17:11:39,313 [INFO] RoadGuardLaptop: ============================================================
+2026-04-06 17:11:39,314 [INFO] RoadGuardLaptop:   RoadGuard Laptop Setup — Collaborative Verification
+2026-04-06 17:11:39,315 [INFO] RoadGuardLaptop:   Vehicle ID: laptop-001
+2026-04-06 17:11:39,315 [INFO] RoadGuardLaptop: ============================================================
+2026-04-06 17:11:44,945 [INFO] RoadGuardLaptop: 📷 WebCam: ✅ (640x480)
+2026-04-06 17:11:45,062 [INFO] pothole_detector: YOLO model loaded: C:\Users\DELL\OneDrive\Desktop\IITGN.AI\Pothole\runs\detect\pothole_blur_augmented2\weights\best.pt
+2026-04-06 17:11:45,063 [INFO] pothole_detector: Model classes: {0: 'Drain Hole', 1: 'circle-drain-clean-', 2: 'drain-clean-', 3: 'drain-not clean-', 4: 'hole', 5: 'manhole', 6: 'pothole', 7: 'sewer cover'}
+2026-04-06 17:11:45,063 [INFO] RoadGuardLaptop: 🕳️  Detector: ✅
+2026-04-06 17:11:45,064 [WARNING] thermal_detector: MLX90640 not available — running in simulation mode
+2026-04-06 17:11:45,065 [INFO] RoadGuardLaptop: 🌡️  Thermal: ⚠️ Sim mode
+2026-04-06 17:11:45,065 [INFO] gps_reader: GPS (IP Geolocation) initialized
+2026-04-06 17:11:45,504 [INFO] gps_reader: Loaded IP Geolocation: 23.2167, 72.6833
+2026-04-06 17:11:45,505 [INFO] RoadGuardLaptop: 📍 GPS (IP Geolocation): ✅
+2026-04-06 17:11:45,505 [INFO] buzzer: Buzzer initialized on Windows speaker
+2026-04-06 17:11:45,511 [INFO] RoadGuardLaptop: 🌐 Server: ✅ Connected
+2026-04-06 17:11:45,512 [INFO] RoadGuardLaptop: ------------------------------------------------------------
+2026-04-06 17:11:45,512 [INFO] RoadGuardLaptop: 💻 Running on Laptop. Press Ctrl+C to stop.
+
+2026-04-06 17:11:46,981 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 17:11:47,005 [INFO] api_client: ✅ potholes: verified — ok
+2026-04-06 17:11:47,007 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=64%
+2026-04-06 17:11:47,007 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 17:11:49,112 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 17:11:49,138 [INFO] api_client: ✅ potholes: created — ok
+2026-04-06 17:11:49,138 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=60%
+2026-04-06 17:12:03,217 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 17:12:03,244 [INFO] api_client: ✅ potholes: verified — ok
+2026-04-06 17:12:03,245 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 17:12:03,245 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=84%
+2026-04-06 17:12:05,347 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 17:12:05,373 [INFO] api_client: ✅ potholes: created — ok
+2026-04-06 17:12:05,374 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=63%
+2026-04-06 17:12:07,654 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 17:12:07,672 [INFO] api_client: ✅ potholes: created — ok
+2026-04-06 17:12:07,674 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 17:12:07,674 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=71%
+2026-04-06 17:12:10,286 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 17:12:10,324 [INFO] api_client: ✅ potholes: verified — ok
+2026-04-06 17:12:10,325 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=83%
+2026-04-06 17:12:12,440 [INFO] pothole_detector: Detected 2 pothole(s): ['low', 'low']
+2026-04-06 17:12:12,466 [INFO] api_client: ✅ potholes: created — ok
+2026-04-06 17:12:12,467 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 17:12:12,467 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=88%
+2026-04-06 17:12:12,487 [INFO] api_client: ✅ potholes: verified — ok
+2026-04-06 17:12:12,488 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=61%
+2026-04-06 17:19:55,499 [INFO] RoadGuardLaptop: Shutdown signal received...
+2026-04-06 17:19:55,508 [INFO] RoadGuardLaptop: 
+🛑 Shutting down RoadGuard Laptop...
+2026-04-06 17:19:55,565 [INFO] gps_reader: GPS disconnected
+2026-04-06 17:19:55,565 [INFO] RoadGuardLaptop: Goodbye! 👋
+
+2026-04-06 17:20:07,016 [INFO] RoadGuardLaptop: ============================================================
+2026-04-06 17:20:07,017 [INFO] RoadGuardLaptop:   RoadGuard Laptop Setup — Collaborative Verification
+2026-04-06 17:20:07,017 [INFO] RoadGuardLaptop:   Vehicle ID: laptop-001
+2026-04-06 17:20:07,018 [INFO] RoadGuardLaptop: ============================================================
+2026-04-06 17:20:13,176 [INFO] RoadGuardLaptop: 📷 WebCam: ✅ (640x480)
+2026-04-06 17:20:13,310 [INFO] pothole_detector: YOLO model loaded: C:\Users\DELL\OneDrive\Desktop\IITGN.AI\Pothole\runs\detect\pothole_blur_augmented2\weights\best.pt
+2026-04-06 17:20:13,310 [INFO] pothole_detector: Model classes: {0: 'Drain Hole', 1: 'circle-drain-clean-', 2: 'drain-clean-', 3: 'drain-not clean-', 4: 'hole', 5: 'manhole', 6: 'pothole', 7: 'sewer cover'}
+2026-04-06 17:20:13,311 [INFO] RoadGuardLaptop: 🕳️  Detector: ✅
+2026-04-06 17:20:13,311 [WARNING] thermal_detector: MLX90640 not available — running in simulation mode
+2026-04-06 17:20:13,312 [INFO] RoadGuardLaptop: 🌡️  Thermal: ⚠️ Sim mode
+2026-04-06 17:20:13,312 [INFO] gps_reader: GPS (IP Geolocation) initialized
+2026-04-06 17:20:13,729 [INFO] gps_reader: Loaded IP Geolocation: 23.2167, 72.6833
+2026-04-06 17:20:13,731 [INFO] RoadGuardLaptop: 📍 GPS (IP Geolocation): ✅
+2026-04-06 17:20:13,731 [INFO] buzzer: Buzzer initialized on Windows speaker
+2026-04-06 17:20:13,739 [INFO] RoadGuardLaptop: 🌐 Server: ✅ Connected
+2026-04-06 17:20:13,739 [INFO] RoadGuardLaptop: ------------------------------------------------------------
+2026-04-06 17:20:13,739 [INFO] RoadGuardLaptop: 💻 Running on Laptop. Press Ctrl+C to stop.
+
+2026-04-06 17:20:15,336 [INFO] pothole_detector: Detected 1 pothole(s): ['medium']
+2026-04-06 17:20:15,361 [INFO] api_client: ✅ potholes: created — ok
+2026-04-06 17:20:15,363 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 17:20:15,363 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=medium conf=60%
+2026-04-06 17:20:17,948 [INFO] pothole_detector: Detected 7 pothole(s): ['low', 'low', 'low', 'low', 'low', 'critical', 'low']
+2026-04-06 17:20:17,970 [INFO] api_client: ✅ potholes: verified — ok
+2026-04-06 17:20:17,971 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=88%
+2026-04-06 17:20:17,989 [INFO] api_client: ✅ potholes: verified — ok
+2026-04-06 17:20:17,990 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=84%
+2026-04-06 17:20:18,009 [INFO] api_client: ✅ potholes: verified — ok
+2026-04-06 17:20:18,009 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=82%
+2026-04-06 17:20:18,028 [INFO] api_client: ✅ potholes: verified — ok
+2026-04-06 17:20:18,028 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=74%
+2026-04-06 17:20:18,047 [INFO] api_client: ✅ potholes: verified — ok
+2026-04-06 17:20:18,047 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=63%
+2026-04-06 17:20:18,066 [INFO] api_client: ✅ potholes: verified — ok
+2026-04-06 17:20:18,066 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=critical conf=55%
+2026-04-06 17:20:18,086 [INFO] api_client: ✅ potholes: verified — ok
+2026-04-06 17:20:18,086 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=52%
+2026-04-06 17:20:20,188 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 17:20:20,217 [INFO] api_client: ✅ potholes: verified — ok
+2026-04-06 17:20:20,218 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 17:20:20,218 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=57%
+2026-04-06 17:20:22,336 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 17:20:22,368 [INFO] api_client: ✅ potholes: created — ok
+2026-04-06 17:20:22,369 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=80%
+2026-04-06 17:20:24,939 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 17:20:24,962 [INFO] api_client: ✅ potholes: created — ok
+2026-04-06 17:20:24,963 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 17:20:24,964 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=54%
+2026-04-06 17:20:29,217 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 17:20:29,240 [INFO] api_client: ✅ potholes: verified — ok
+2026-04-06 17:20:29,242 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 17:20:29,242 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=61%
+2026-04-06 17:20:34,936 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 17:20:34,976 [INFO] api_client: ✅ potholes: verified — ok
+2026-04-06 17:20:34,978 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 17:20:34,978 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=60%
+2026-04-06 17:20:37,238 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-06 17:20:37,276 [INFO] api_client: ✅ potholes: verified — ok
+2026-04-06 17:20:37,276 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=low conf=53%
+2026-04-06 17:20:39,467 [INFO] pothole_detector: Detected 1 pothole(s): ['medium']
+2026-04-06 17:20:39,486 [INFO] api_client: ✅ potholes: verified — ok
+2026-04-06 17:20:39,487 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 17:20:39,488 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=medium conf=77%
+2026-04-06 17:20:41,606 [INFO] pothole_detector: Detected 1 pothole(s): ['medium']
+2026-04-06 17:20:41,630 [INFO] api_client: ✅ potholes: verified — ok
+2026-04-06 17:20:41,630 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=medium conf=93%
+2026-04-06 17:21:36,792 [INFO] pothole_detector: Detected 1 pothole(s): ['critical']
+2026-04-06 17:21:36,825 [INFO] api_client: ✅ potholes: created — ok
+2026-04-06 17:21:36,827 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-06 17:21:36,827 [INFO] RoadGuardLaptop: 🕳️ NEW POTHOLE severity=critical conf=56%
+2026-04-06 17:21:45,510 [INFO] RoadGuardLaptop: Shutdown signal received...
+2026-04-06 17:21:45,525 [INFO] RoadGuardLaptop: 
+🛑 Shutting down RoadGuard Laptop...
+2026-04-06 17:21:45,877 [INFO] gps_reader: GPS disconnected
+2026-04-06 17:21:45,877 [INFO] RoadGuardLaptop: Goodbye! 👋
+

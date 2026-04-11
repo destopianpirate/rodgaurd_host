@@ -32,6 +32,7 @@ class Buzzer:
         self.cooldown = cooldown
         self.last_alert_time = 0
         self._playing = False
+        self._lock = threading.Lock()
         self._buzzer = None
 
         if GPIOZERO_AVAILABLE:

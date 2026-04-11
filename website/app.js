@@ -8,7 +8,7 @@
 // ─── Config ────────────────────────────────────────────────
 const CONFIG = {
     API_BASE: 'http://localhost:5000/api',
-    REFRESH_INTERVAL: 60,
+    REFRESH_INTERVAL: 3,
     DEFAULT_CENTER: { lat: 28.6139, lng: 77.2090 },
     DEFAULT_ZOOM: 15,
     MAP_ID: 'DEMO_MAP_ID'
