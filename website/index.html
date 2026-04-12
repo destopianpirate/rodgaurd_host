@@ -35,6 +35,13 @@
         </div>
         <div class="header-right">
             <div class="header-actions">
+                <a href="admin.html" class="btn-theme-circle" title="Admin Dashboard" style="display: flex; justify-content: center; align-items: center; text-decoration: none;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                        <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                        <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                    </svg>
+                </a>
                 <button class="btn-theme-circle" id="refreshBtn" title="Refresh data now">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2.5">
@@ -197,56 +204,6 @@
                 </svg>
             </button>
 
-            <!-- Shortest Route / Directions Panel -->
-            <div class="routing-panel" id="routingPanel">
-                <div class="route-row">
-                    <span class="route-label">
-                        <span class="input-icon origin-icon">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                            </svg>
-                        </span>
-                        From
-                    </span>
-                    <div class="route-input-wrapper">
-                        <input type="text" id="routeOrigin" placeholder="Origin (Leave blank for gps)"
-                            class="route-input" autocomplete="off">
-                        <div class="route-suggestions" id="originSuggestions"></div>
-                    </div>
-                </div>
-
-                <div class="route-row">
-                    <span class="route-label">
-                        <span class="input-icon dest-icon">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                                <path
-                                    d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-                            </svg>
-                        </span>
-                        To
-                    </span>
-                    <div class="route-input-wrapper">
-                        <input type="text" id="routeDest" placeholder="Destination" class="route-input"
-                            autocomplete="off">
-                        <button class="btn-route-arrow pulse-high" id="getRouteBtn" aria-label="Get Directions">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2.5">
-                                <path d="M5 12h14M12 5l7 7-7 7" />
-                            </svg>
-                        </button>
-                        <div class="route-suggestions" id="destSuggestions"></div>
-                    </div>
-                </div>
-
-                <!-- Route Info Panel (appears after route is calculated) -->
-                <div class="route-info-panel" id="routeInfoPanel">
-                    <div class="route-info-modes" id="routeInfoModes">
-                        <!-- Populated by JS -->
-                    </div>
-                </div>
-            </div>
-
             <!-- Radar Sweep Overlay -->
             <div class="radar-container" id="radarContainer">
                 <div class="radar-sweep"></div>
@@ -345,7 +302,7 @@
             libraries: "places"
         });
     </script>
-    <script src="app_v16.js?v=114"></script>
+    <script src="app_v16.js?v=118"></script>
 </body>
 
 </html>

@@ -17,11 +17,10 @@ const CONFIG = {
 // ─── State ─────────────────────────────────────────────────
 let map = null;
 let infoWindow = null;
-let directionsService = null;
-let directionsRenderer = null;
-let autocompleteService = null;
+
 let markers = {}; // id -> AdvancedMarkerElement
-let potholeData = [];
+let potholeData = []; // ACTIVE Hazards
+let resolvedData = []; // RESOLVED Hazards for stats
 let countdown = CONFIG.REFRESH_INTERVAL;
 let refreshTimerTracker = null;
 
@@ -144,22 +143,7 @@ async function initMap() {
             }
         });
 
-        // Initialize Routing Services
-        const { DirectionsService, DirectionsRenderer } = await google.maps.importLibrary("routes");
-        directionsService = new DirectionsService();
-        directionsRenderer = new DirectionsRenderer({
-            map: map,
-            suppressMarkers: false,
-            polylineOptions: {
-                strokeColor: '#3b82f6',
-                strokeOpacity: 0.8,
-                strokeWeight: 6
-            }
-        });
 
-        // Initialize Places Autocomplete Service
-        const placesLib = await google.maps.importLibrary("places");
-        autocompleteService = new placesLib.AutocompleteService();
 
         // Add Live Location Button to Native Google Maps Controls
         const liveLocBtn = document.getElementById('liveLocationBtn');
@@ -327,7 +311,10 @@ async function loadAllData() {
         const active = await activeRes.json();
         const resolved = await resolvedRes.json();
 
-        potholeData = [...active.map(p => ({ ...p, status: 'active' })), ...resolved.map(p => ({ ...p, status: 'resolved' }))];
+        // Strictly separate: potholeData for ACTIVE Hazards (Map & Feed)
+        potholeData = active.map(p => ({ ...p, status: 'active' }));
+        // resolvedData for Stats & History
+        resolvedData = resolved.map(p => ({ ...p, status: 'resolved' }));
 
         updateMarkers();
         updateSeverityBars(stats.severity_breakdown);
@@ -341,19 +328,23 @@ async function loadAllData() {
 async function updateMarkers() {
     const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
-    const currentIds = new Set(potholeData.map(p => p.id));
+    // Clear ANY marker that is not in the current ACTIVE potholeData
+    const activeIds = new Set(potholeData.map(p => p.id));
     Object.keys(markers).forEach(id => {
-        if (!currentIds.has(parseInt(id))) {
-            markers[id].map = null;
+        if (!activeIds.has(parseInt(id))) {
+            if (markers[id]) markers[id].map = null;
             delete markers[id];
         }
     });
 
+    // Create or update markers ONLY for items in potholeData (which is now only active)
     potholeData.forEach((p, i) => {
-        const isResolved = p.status === 'resolved';
+        const isResolved = p.status === 'resolved'; // Still check in case, though loadAllData filters it now
+        if (isResolved) return; // Skip resolved markers entirely
+
 
         const cfg = SEVERITY_CONFIG[p.severity] || SEVERITY_CONFIG.medium;
-        const color = isResolved ? '#64748b' : cfg.color;
+        const color = cfg.color;
 
         if (!markers[p.id]) {
             const root = document.createElement('div');
@@ -400,37 +391,42 @@ async function updateMarkers() {
 function updateVisibleStats() {
     if (!map) return;
 
-    // Filter to only potholes visible in the current map viewport
+    // Filter to only active and resolved potholes visible in the current map viewport
     const bounds = map.getBounds();
-    let visibleData = potholeData;
+    let visibleActive = potholeData;
+    let visibleResolved = resolvedData;
+
     if (bounds) {
-        visibleData = potholeData.filter(p => {
-            const pos = new google.maps.LatLng(p.lat, p.lng);
-            return bounds.contains(pos);
-        });
+        visibleActive = potholeData.filter(p => bounds.contains(new google.maps.LatLng(p.lat, p.lng)));
+        visibleResolved = resolvedData.filter(p => bounds.contains(new google.maps.LatLng(p.lat, p.lng)));
     }
 
-    const activeData = visibleData.filter(p => p.status === 'active');
-    const resolvedData = visibleData.filter(p => p.status === 'resolved');
-
-    animateCounter('totalPotholes', activeData.length);
-    animateCounter('resolvedPotholes', resolvedData.length);
+    animateCounter('totalPotholes', visibleActive.length);
+    animateCounter('resolvedPotholes', visibleResolved.length);
 
     const counts = { critical: 0, high: 0, medium: 0, low: 0 };
-    activeData.forEach(p => counts[p.severity]++);
+    visibleActive.forEach(p => counts[p.severity]++);
     updateSeverityBars(counts);
 
-    // Feed uses only viewport-visible data
-    const feed = visibleData.sort((a, b) => new Date(b.detected_at) - new Date(a.detected_at)).slice(0, 30);
+    // Feed uses only viewport-visible active data
+    const feed = visibleActive.sort((a, b) => new Date(b.detected_at) - new Date(a.detected_at)).slice(0, 30);
     renderFeed(feed);
 
     // Phase 12 new features
-    calcRiskScore(visibleData);
+    calcRiskScore(visibleActive);
     renderTimeline();
 }
 
+let lastFeedSignature = "";
+
 function renderFeed(items) {
     const feed = document.getElementById('detectionFeed');
+    
+    // State Check: Only re-render the feed DOM if the data has actually changed
+    const signature = items.map(p => p.id).join(',');
+    if (signature === lastFeedSignature && items.length > 0) return;
+    lastFeedSignature = signature;
+
     if (!items.length) {
         feed.innerHTML = `<div class="feed-empty"><div class="feed-empty-icon">${ICONS.hole}</div>No hazards in view</div>`;
         return;
@@ -618,6 +614,24 @@ async function markManuallyResolved(id) {
     const tt = document.getElementById('smartTooltip');
     if (tt) tt.classList.remove('visible');
 
+    // Live Removal: Update local state immediately for instant feedback
+    const pIndex = potholeData.findIndex(p => p.id === id);
+    if (pIndex !== -1) {
+        // Transfer from active to resolved locally
+        const p = potholeData.splice(pIndex, 1)[0];
+        p.status = 'resolved';
+        resolvedData.push(p);
+        
+        // Remove marker from map immediately
+        if (markers[id]) {
+            markers[id].map = null;
+            delete markers[id];
+        }
+        
+        // Refresh UI stats and feed locally
+        updateVisibleStats();
+    }
+
     try {
         const res = await fetch(`${CONFIG.API_BASE}/potholes/${id}/resolve`, {
             method: 'POST'
@@ -625,217 +639,19 @@ async function markManuallyResolved(id) {
         const data = await res.json();
         if (data.status === 'success') {
             showToast('Hazard manually marked as resolved', 'success');
-            loadAllData(); // Reload map to turn icon gray
+            // Final sync to ensure server state
+            loadAllData();
         } else {
             showToast('Failed to resolve', 'error');
+            loadAllData(); // Revert
         }
     } catch (e) {
         showToast('Network error resolving hazard', 'error');
+        loadAllData(); // Revert
     }
 }
 
-// ══════════════════════════════════════════════════════════
-// ROUTING (DIRECTIONS API)
-// ══════════════════════════════════════════════════════════
-async function calculateAndDisplayRoute() {
-    if (!directionsService || !directionsRenderer) {
-        showToast('Routing services not initialized yet.', 'error');
-        return;
-    }
 
-    // Hide any open suggestions
-    document.getElementById('originSuggestions')?.classList.remove('active');
-    document.getElementById('destSuggestions')?.classList.remove('active');
-
-    const startInput = document.getElementById('routeOrigin').value.trim();
-    const endInput = document.getElementById('routeDest').value.trim();
-
-    if (!endInput) {
-        showToast('Please enter a destination.', 'error');
-        return;
-    }
-
-    showToast('Calculating optimal route...', 'info');
-
-    let origin = startInput;
-
-    // If start is empty, fallback to the user's location via geolocation
-    if (!startInput) {
-        if (!navigator.geolocation) {
-            showToast('Geolocation is not supported. Please type an origin.', 'error');
-            return;
-        }
-        try {
-            const pos = await new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(resolve, reject);
-            });
-            origin = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        } catch (e) {
-            showToast('Could not fetch location. Please type an origin.', 'error');
-            return;
-        }
-    }
-
-    // Calculate DRIVING route (primary display)
-    directionsService.route(
-        {
-            origin: origin,
-            destination: endInput,
-            travelMode: google.maps.TravelMode.DRIVING,
-            provideRouteAlternatives: true,
-            region: 'IN'
-        },
-        (response, status) => {
-            if (status === 'OK') {
-                directionsRenderer.setDirections(response);
-                showToast('Route generated successfully!', 'success');
-
-                // Extract driving info
-                const leg = response.routes[0].legs[0];
-                const drivingTime = leg.duration.text;
-                const drivingDist = leg.distance.text;
-
-                // Fetch TWO_WHEELER mode info
-                directionsService.route(
-                    {
-                        origin: origin,
-                        destination: endInput,
-                        travelMode: google.maps.TravelMode.TWO_WHEELER,
-                        region: 'IN'
-                    },
-                    (bikeResp, bikeStatus) => {
-                        let bikeTime = drivingTime;
-                        let bikeDist = drivingDist;
-                        if (bikeStatus === 'OK') {
-                            const bikeLeg = bikeResp.routes[0].legs[0];
-                            bikeTime = bikeLeg.duration.text;
-                            bikeDist = bikeLeg.distance.text;
-                        }
-                        showRouteInfoPanel(drivingTime, drivingDist, bikeTime, bikeDist);
-                    }
-                );
-            } else {
-                showToast('Directions request failed (' + status + '). Try adding a city name.', 'error');
-                hideRouteInfoPanel();
-            }
-        }
-    );
-}
-
-// Show the route info panel with travel mode cards
-function showRouteInfoPanel(carTime, carDist, bikeTime, bikeDist) {
-    const panel = document.getElementById('routeInfoPanel');
-    const modes = document.getElementById('routeInfoModes');
-    if (!panel || !modes) return;
-
-    modes.innerHTML = `
-        <div class="route-mode-card">
-            <div class="route-mode-icon">🚗</div>
-            <div class="route-mode-label">Car</div>
-            <div class="route-mode-time">${carTime}</div>
-            <div class="route-mode-dist">${carDist}</div>
-        </div>
-        <div class="route-mode-card">
-            <div class="route-mode-icon">🏍️</div>
-            <div class="route-mode-label">Bike</div>
-            <div class="route-mode-time">${bikeTime}</div>
-            <div class="route-mode-dist">${bikeDist}</div>
-        </div>
-    `;
-    panel.classList.add('active');
-}
-
-function hideRouteInfoPanel() {
-    const panel = document.getElementById('routeInfoPanel');
-    if (panel) panel.classList.remove('active');
-}
-
-// ══════════════════════════════════════════════════════════
-// PLACES AUTOCOMPLETE (Custom Dropdown)
-// ══════════════════════════════════════════════════════════
-function setupPlacesAutocomplete() {
-    const originInput = document.getElementById('routeOrigin');
-    const destInput = document.getElementById('routeDest');
-    const originSuggestions = document.getElementById('originSuggestions');
-    const destSuggestions = document.getElementById('destSuggestions');
-
-    if (!originInput || !destInput || !originSuggestions || !destSuggestions) return;
-
-    let debounceTimer = null;
-
-    function fetchSuggestions(query, container, inputEl) {
-        if (!autocompleteService || query.length < 4) {
-            container.classList.remove('active');
-            container.innerHTML = '';
-            return;
-        }
-
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-            autocompleteService.getPlacePredictions(
-                {
-                    input: query,
-                    componentRestrictions: { country: 'in' }
-                },
-                (predictions, status) => {
-                    container.innerHTML = '';
-                    if (status !== google.maps.places.PlacesServiceStatus.OK || !predictions) {
-                        container.classList.remove('active');
-                        return;
-                    }
-                    predictions.forEach(pred => {
-                        const item = document.createElement('div');
-                        item.className = 'suggestion-item';
-                        item.innerHTML = `
-                            <span class="suggestion-icon">📍</span>
-                            <span class="suggestion-text">${pred.description}</span>
-                        `;
-                        item.addEventListener('click', () => {
-                            inputEl.value = pred.description;
-                            container.classList.remove('active');
-                            container.innerHTML = '';
-                        });
-                        container.appendChild(item);
-                    });
-                    container.classList.add('active');
-                }
-            );
-        }, 300);
-    }
-
-    originInput.addEventListener('input', () => {
-        fetchSuggestions(originInput.value.trim(), originSuggestions, originInput);
-    });
-
-    destInput.addEventListener('input', () => {
-        fetchSuggestions(destInput.value.trim(), destSuggestions, destInput);
-    });
-
-    // Enter key triggers route calculation
-    originInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            originSuggestions.classList.remove('active');
-            calculateAndDisplayRoute();
-        }
-    });
-
-    destInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            destSuggestions.classList.remove('active');
-            calculateAndDisplayRoute();
-        }
-    });
-
-    // Close suggestions when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!originInput.contains(e.target) && !originSuggestions.contains(e.target)) {
-            originSuggestions.classList.remove('active');
-        }
-        if (!destInput.contains(e.target) && !destSuggestions.contains(e.target)) {
-            destSuggestions.classList.remove('active');
-        }
-    });
-}
 
 // ══════════════════════════════════════════════════════════
 // SMART SEEDING & CONNECTIVITY
@@ -982,7 +798,8 @@ function setupEventListeners() {
     const exportBtn = document.getElementById('exportBtn');
     if (exportBtn) {
         exportBtn.addEventListener('click', () => {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(potholeData, null, 2));
+            const allData = [...potholeData, ...resolvedData];
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allData, null, 2));
             const dl = document.createElement('a');
             dl.setAttribute("href", dataStr);
             dl.setAttribute("download", "pothole_report.json");
@@ -1020,14 +837,7 @@ function setupEventListeners() {
         });
     });
 
-    // Routing Panel Setup
-    const getRouteBtn = document.getElementById('getRouteBtn');
-    if (getRouteBtn) {
-        getRouteBtn.addEventListener('click', calculateAndDisplayRoute);
-    }
 
-    // Setup Places Autocomplete
-    setupPlacesAutocomplete();
 
     // Phase 13: Card Spotlight Effect
     document.addEventListener('mousemove', e => {
@@ -1243,9 +1053,9 @@ async function updateWeatherLocation(rawLat, rawLng) {
             roadClass = 'may-wet';
             extraWarning = '⚠️ Moderate Pothole Risk: Puddles possible.';
         } else {
-            roadCondition = '☀️ Dry Roads — No recent precipitation';
+            roadCondition = '✅ Optimal scanning conditions';
             roadClass = 'dry';
-            extraWarning = '✅ Optimal scanning conditions.';
+            extraWarning = '';
         }
 
         // Temperature-based thermal sensor warnings
@@ -1255,7 +1065,9 @@ async function updateWeatherLocation(rawLat, rawLng) {
             extraWarning += ' ❄️ Ice Risk: Black ice possible on roads.';
         }
 
-        roadCondition += `<br><span class="weather-alert">${extraWarning}</span>`;
+        if (extraWarning) {
+            roadCondition += ` <span class="weather-alert">${extraWarning}</span>`;
+        }
 
         // Update UI elements
         const tempEl = document.getElementById('weatherTemp');
@@ -1354,7 +1166,7 @@ function renderTimeline() {
     const slotMs = 3600000; // 1 hour each
     const counts = new Array(SLOTS).fill(0);
 
-    potholeData.forEach(p => {
+    [...potholeData, ...resolvedData].forEach(p => {
         const age = now - new Date(p.detected_at).getTime();
         const slot = Math.floor(age / slotMs);
         if (slot >= 0 && slot < SLOTS) counts[SLOTS - 1 - slot]++;

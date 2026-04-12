@@ -290,6 +290,45 @@ def clear_data():
     return jsonify({"status": "success", "message": "All potholes cleared"})
 
 
+@app.route('/api/potholes/<int:pothole_id>', methods=['DELETE'])
+def delete_pothole(pothole_id):
+    """Delete a specific pothole record."""
+    db = get_db()
+    cursor = db.execute("DELETE FROM potholes WHERE id = ?", (pothole_id,))
+    db.commit()
+    if cursor.rowcount == 0:
+        return jsonify({"status": "error", "message": "Pothole not found"}), 404
+    return jsonify({"status": "success"})
+
+
+@app.route('/api/potholes/<int:pothole_id>', methods=['PUT'])
+def update_pothole(pothole_id):
+    """Update a specific pothole record (Admin action)."""
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Request body must be JSON"}), 400
+
+    db = get_db()
+    existing = db.execute("SELECT * FROM potholes WHERE id = ?", (pothole_id,)).fetchone()
+    if not existing:
+        return jsonify({"status": "error", "message": "Pothole not found"}), 404
+
+    lat = data.get('lat', existing['latitude'])
+    lng = data.get('lng', existing['longitude'])
+    severity = data.get('severity', existing['severity'])
+    confidence = data.get('confidence', existing['confidence'])
+    status = data.get('status', existing['status'])
+    description = data.get('description', existing['description'])
+
+    db.execute(
+        "UPDATE potholes SET latitude=?, longitude=?, severity=?, confidence=?, status=?, description=? WHERE id = ?",
+        (lat, lng, severity, confidence, status, description, pothole_id)
+    )
+    db.commit()
+    return jsonify({"status": "success"})
+
+
+
 # ─── Health check ───────────────────────────────────────────────────────────
 
 @app.route('/api/health', methods=['GET'])

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoadGuard — Database Administration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=11">
+    <link rel="stylesheet" href="css/sidebar-revamp.css?v=12">
+    <style>
+        body.light-theme {
+            --bg-primary: #f8fafc;
+            --panel-bg: #ffffff;
+            --panel-header-bg: #f1f5f9;
+            --text-primary: #020617;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --hover-bg: #f8fafc;
+            --primary-color: #f97316;
+            --danger-color: #ef4444;
+        }
+
+        body.dark-theme {
+            --bg-primary: #020617;
+            --panel-bg: #0f172a;
+            --panel-header-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --hover-bg: #1e293b;
+            --primary-color: #f97316;
+            --danger-color: #ef4444;
+        }
+
+        body.admin-body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-primary, #0f172a); color: var(--text-primary, #f8fafc); padding: 20px; overflow: hidden !important; height: 100vh !important; margin: 0; box-sizing: border-box; display: flex; flex-direction: column; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-shrink: 0; }
+        .admin-title { font-size: 24px; font-weight: 800; flex: 1; }
+        .admin-center { flex: 1; display: flex; justify-content: center; }
+        .admin-actions { flex: 1; display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
+        .admin-actions button { background: var(--primary-color, #3b82f6); color: white; border: none; padding: 10px 20px; border-radius: 99px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .admin-actions button:hover { background: #2563eb; }
+        
+        table { width: 100%; border-collapse: collapse; background: var(--panel-bg, rgba(30, 41, 59, 0.7)); border-radius: 12px; overflow: hidden; color: var(--text-primary, #f8fafc); }
+        th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.05)); }
+        th { background: var(--panel-header-bg, rgba(15, 23, 42, 0.8)); font-weight: 600; color: var(--text-secondary, #94a3b8); text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
+        tr:hover { background: var(--hover-bg, rgba(255,255,255,0.05)); }
+        
+        .sev-badge { padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        .sev-low { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+        .sev-medium { background: rgba(234, 179, 8, 0.2); color: #facc15; }
+        .sev-high { background: rgba(249, 115, 22, 0.2); color: #fb923c; }
+        .sev-critical { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+        
+        .status-badge { padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; text-transform: uppercase; border: 1px solid currentColor; }
+        .stat-active { color: var(--danger-color, #ef4444); }
+        .stat-resolved { color: var(--text-secondary, #94a3b8); }
+        
+        .btn-edit { background: transparent; color: var(--primary-color, #3b82f6); border: 1px solid var(--primary-color, #3b82f6); padding: 6px 12px; border-radius: 99px; cursor: pointer; font-size: 13px; margin-right: 8px; }
+        .btn-edit:hover { background: rgba(59, 130, 246, 0.2); }
+        .btn-del { background: transparent; color: var(--danger-color, #ef4444); border: 1px solid var(--danger-color, #ef4444); padding: 6px 12px; border-radius: 99px; cursor: pointer; font-size: 13px; }
+        .btn-del:hover { background: rgba(239, 68, 68, 0.2); }
+        
+        /* Modal Styles */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px); z-index: 1000; justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: var(--panel-bg, #1e293b); padding: 32px; border-radius: 16px; width: 100%; max-width: 500px; border: 1px solid var(--border-color, rgba(255,255,255,0.1)); }
+        .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; color: var(--text-primary, white); }
+        .form-group { margin-bottom: 16px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 6px; color: var(--text-secondary, #94a3b8); font-size: 13px; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color, rgba(255,255,255,0.1)); background: var(--bg-primary, rgba(15,23,42,0.8)); color: var(--text-primary, white); box-sizing: border-box; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
+        .btn-cancel { background: transparent; color: var(--text-primary, white); border: 1px solid var(--border-color, rgba(255,255,255,0.2)); padding: 10px 16px; border-radius: 99px; cursor: pointer; }
+        .btn-cancel:hover { background: var(--hover-bg, rgba(255,255,255,0.1)); }
+        .btn-save { background: var(--primary-color, #3b82f6); color: white; border: none; padding: 10px 16px; border-radius: 99px; cursor: pointer; font-weight: 600; }
+        .btn-save:hover { background: #2563eb; }
+        .admin-options { display: flex; gap: 12px; margin-bottom: 20px; align-items: center; background: var(--panel-bg, rgba(30, 41, 59, 0.7)); padding: 16px; border-radius: 12px; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border: 1px solid var(--border-color); }
+        .admin-options input, .admin-options select { padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-family: inherit; font-size: 14px; width: 100%; max-width: 200px; transition: 0.3s; }
+        .admin-options input:focus, .admin-options select:focus { outline: inset 2px var(--primary-color); }
+        .admin-options .search-container { flex: 1; min-width: 250px; max-width: none; }
+        .admin-options .search-container input { max-width: none; }
+
+        /* Animations */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        tbody tr { animation: fadeUp 0.4s ease-out forwards; opacity: 0; }
+        
+        .animated-row { transition: background 0.3s, transform 0.2s; }
+        .animated-row:hover { transform: scale(1.006); box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; position: relative; }
+
+    </style>
+</head>
+<body class="admin-body light-theme">
+    <div class="admin-header">
+        <div class="admin-title">RoadGuard Intelligence Database</div>
+        <div class="admin-center">
+            <a href="index.html" style="color: var(--text-secondary); text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                Main Dashboard
+            </a>
+        </div>
+        <div class="admin-actions">
+            <button id="addBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Add 
+            </button>
+            <button id="refreshDataBtn" style="background:transparent; color: var(--text-primary); border: 1px solid var(--border-color);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                Refresh
+            </button>
+            <button id="clearBtn" style="background: var(--danger-color); color: white;">
+                Clear DB
+            </button>
+            <button id="themeToggle" title="Toggle Theme" style="background:transparent; color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 50%; padding: 10px; width: 40px; height: 40px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+    
+    <div style="flex: 1; overflow-y: auto; border-radius: 12px; background: var(--panel-bg); border: 1px solid var(--border-color);">
+        <table>
+            <thead style="position: sticky; top: 0; z-index: 10;">
+                <tr>
+                        <tr>
+                            <th>ID</th>
+                            <th>Location</th>
+                            <th>Severity</th>
+                            <th>Confidence</th>
+                            <th>Status</th>
+                            <th>Verified</th>
+                            <th>Description</th>
+                            <th style="width: 120px;">Actions</th>
+                        </tr>
+        </thead>
+        <tbody id="potholeTableBody">
+            <tr><td colspan="7" style="text-align: center;">Loading data...</td></tr>
+        </tbody>
+    </table>
+    </div>
+
+    <!-- Modal for Edit/Add -->
+    <div class="modal" id="potholeModal">
+        <div class="modal-content">
+            <h2 class="modal-title" id="modalTitle">Edit Pothole</h2>
+            <form id="potholeForm">
+                <input type="hidden" id="pid">
+                <div class="form-group">
+                    <label>Latitude</label>
+                    <input type="number" step="any" id="plat" required>
+                </div>
+                <div class="form-group">
+                    <label>Longitude</label>
+                    <input type="number" step="any" id="plng" required>
+                </div>
+                <div class="form-group">
+                    <label>Severity</label>
+                    <select id="pseverity">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Confidence (0.0 to 1.0)</label>
+                    <input type="number" step="0.01" min="0" max="1" id="pconf" required>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="pstatus">
+                        <option value="active">Active</option>
+                        <option value="resolved">Resolved</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" id="pdesc" placeholder="Details about hazard">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" id="closeModal">Cancel</button>
+                    <button type="submit" class="btn-save">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="admin.js?v=2"></script>
+    <script>
+        // Theme toggler logic
+        const themeBtn = document.getElementById('themeToggle');
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.replace('light-theme', 'dark-theme');
+        }
+        themeBtn.addEventListener('click', () => {
+            if (document.body.classList.contains('light-theme')) {
+                document.body.classList.replace('light-theme', 'dark-theme');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.replace('dark-theme', 'light-theme');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+    </script>
+</body>
+</html>
