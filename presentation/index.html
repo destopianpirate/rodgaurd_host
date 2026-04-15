@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RoadGuard — Technical Pitch</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Navigation -->
+<div class="nav">
+  <span class="nav-title">RoadGuard</span>
+  <span class="nav-counter"><span id="cur">1</span> / <span id="tot">15</span></span>
+  <div class="nav-btns">
+    <button onclick="prev()" id="prevBtn">&#9664;</button>
+    <button onclick="next()" id="nextBtn">&#9654;</button>
+  </div>
+</div>
+
+<div class="deck">
+
+<!-- ========== SLIDE 1: TITLE ========== -->
+<section class="slide active" data-bg="dark">
+  <div class="center-content">
+    <div class="shield-icon">
+      <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="1.5">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+    </div>
+    <h1 class="title-main">RoadGuard</h1>
+    <p class="title-sub">AI-Powered Pothole Detection & Road Safety System</p>
+    <div class="title-meta">
+      <span>IIT Gandhinagar · ES 112 Engineering Project</span>
+    </div>
+    <div class="title-tags">
+      <span class="tag">YOLOv8</span>
+      <span class="tag">Raspberry Pi 4</span>
+      <span class="tag">Edge AI</span>
+      <span class="tag">Real-Time</span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 2: PROBLEM STATEMENT ========== -->
+<section class="slide">
+  <h2 class="slide-title">Problem Statement</h2>
+  <div class="two-col">
+    <div class="col">
+      <h3>The Engineering Problem</h3>
+      <ul>
+        <li>Indian roads have <strong>~33 pothole-related fatalities per day</strong> (MoRTH, 2023)</li>
+        <li>Manual road inspection is <strong>slow, expensive, and reactive</strong></li>
+        <li>No low-cost, real-time system exists for <strong>continuous, automated</strong> pothole mapping from moving vehicles</li>
+      </ul>
+      <div class="callout">
+        <strong>Objective:</strong> Design an edge-deployed, vehicle-mounted system that detects potholes in real-time using computer vision, geo-tags them via GPS, alerts the driver, and streams data to a live web dashboard — all under ₹8,000 hardware cost.
+      </div>
+    </div>
+    <div class="col">
+      <h3>Constraints</h3>
+      <table class="info-table">
+        <tr><td>Compute</td><td>Raspberry Pi 4 (4GB), no GPU</td></tr>
+        <tr><td>Power</td><td>5V/3A USB-C (car adapter)</td></tr>
+        <tr><td>Latency</td><td>Detection must be ≤ 2s at city speeds</td></tr>
+        <tr><td>Environment</td><td>Motion blur, low-light, vibration</td></tr>
+        <tr><td>Cost</td><td>Total BOM &lt; ₹8,000</td></tr>
+        <tr><td>Connectivity</td><td>WiFi (may be intermittent)</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 3: SYSTEM OVERVIEW ========== -->
+<section class="slide">
+  <h2 class="slide-title">System Overview</h2>
+  <div class="block-diagram">
+    <div class="bd-row">
+      <div class="bd-group bd-pi">
+        <div class="bd-header">Raspberry Pi 4 (In-Vehicle)</div>
+        <div class="bd-modules">
+          <div class="bd-mod bd-sensor">Pi Camera v2<br><small>640×480 @ 30fps</small></div>
+          <div class="bd-mod bd-sensor">NEO-M8N GPS<br><small>UART 9600 baud</small></div>
+          <div class="bd-mod bd-sensor">MPU-9250 IMU<br><small>I²C 9-axis</small></div>
+          <div class="bd-mod bd-compute">YOLOv8n<br><small>Pothole Detection</small></div>
+          <div class="bd-mod bd-output">Buzzer<br><small>GPIO 13, Active-Low</small></div>
+          <div class="bd-mod bd-network">API Client<br><small>HTTP + Offline Queue</small></div>
+        </div>
+      </div>
+    </div>
+    <div class="bd-arrow">▼ HTTP over WiFi</div>
+    <div class="bd-row">
+      <div class="bd-group bd-server">
+        <div class="bd-header">Flask Server (Laptop)</div>
+        <div class="bd-modules">
+          <div class="bd-mod bd-compute">REST API<br><small>Port 5000</small></div>
+          <div class="bd-mod bd-data">SQLite DB<br><small>Potholes + IMU</small></div>
+          <div class="bd-mod bd-compute">Dedup Engine<br><small>30m Haversine</small></div>
+        </div>
+      </div>
+    </div>
+    <div class="bd-arrow">▼ HTTP Polling</div>
+    <div class="bd-row">
+      <div class="bd-group bd-web">
+        <div class="bd-header">Web Dashboard (Browser)</div>
+        <div class="bd-modules">
+          <div class="bd-mod bd-output">Google Maps<br><small>Severity Markers</small></div>
+          <div class="bd-mod bd-output">Live Stats<br><small>Auto-Refresh 60s</small></div>
+          <div class="bd-mod bd-output">Routing<br><small>Directions API</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 4: TECHNICAL APPROACH — AI ========== -->
+<section class="slide">
+  <h2 class="slide-title">Technical Approach — AI Model</h2>
+  <div class="two-col">
+    <div class="col">
+      <h3>YOLOv8 Nano Architecture</h3>
+      <ul>
+        <li><strong>Model:</strong> YOLOv8n — 3.2M parameters, single-class (pothole)</li>
+        <li><strong>Input:</strong> 640×480 BGR frames from Picamera2</li>
+        <li><strong>Confidence threshold:</strong> 0.50</li>
+        <li><strong>Severity classification</strong> by bounding-box area ratio:</li>
+      </ul>
+      <table class="info-table compact">
+        <tr><th>Severity</th><th>Area Ratio</th></tr>
+        <tr><td class="sev-critical">Critical</td><td>≥ 15% of frame</td></tr>
+        <tr><td class="sev-high">High</td><td>≥ 8%</td></tr>
+        <tr><td class="sev-medium">Medium</td><td>≥ 3%</td></tr>
+        <tr><td class="sev-low">Low</td><td>&lt; 3%</td></tr>
+      </table>
+      <h3>Design Trade-off</h3>
+      <p>Chose YOLOv8<em>n</em> (nano) over YOLOv8s/m for <strong>2× faster inference</strong> on ARM CPU, accepting ~3% lower mAP. Edge speed > cloud accuracy.</p>
+    </div>
+    <div class="col">
+      <h3>3-Thread Architecture</h3>
+      <div class="thread-diagram">
+        <div class="thread t-main">
+          <div class="thread-label">Main Thread</div>
+          <div class="thread-desc">Camera capture + OpenCV display<br>~30 FPS smooth rendering</div>
+        </div>
+        <div class="thread t-yolo">
+          <div class="thread-label">YOLO Thread</div>
+          <div class="thread-desc">AI inference on latest frame<br>2s cooldown between detections</div>
+        </div>
+        <div class="thread t-gps">
+          <div class="thread-label">GPS Thread</div>
+          <div class="thread-desc">Continuous NMEA parsing<br>Non-blocking position reads</div>
+        </div>
+      </div>
+      <p class="note">Threads share state via Python GIL. YOLO thread copies frame before processing to avoid blocking the display loop.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 5: TECHNICAL APPROACH — SENSING ========== -->
+<section class="slide">
+  <h2 class="slide-title">Technical Approach — Multi-Modal Sensing</h2>
+  <div class="two-col">
+    <div class="col">
+      <h3>Sensor Fusion Pipeline</h3>
+      <div class="pipeline">
+        <div class="pipe-step">
+          <div class="pipe-icon">📷</div>
+          <div class="pipe-text"><strong>Visual (Camera)</strong><br>YOLOv8 object detection<br>Primary detection modality</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="pipe-icon">📡</div>
+          <div class="pipe-text"><strong>Spatial (GPS)</strong><br>NEO-M8N NMEA parsing<br>Geo-tags each detection</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="pipe-icon">📳</div>
+          <div class="pipe-text"><strong>Inertial (IMU)</strong><br>MPU-9250 accelerometer<br>Vibration road-quality scoring</div>
+        </div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">
+          <div class="pipe-icon">🔔</div>
+          <div class="pipe-text"><strong>Alert (Buzzer)</strong><br>GPIO active-low driver<br>Pattern-based alerts</div>
+        </div>
+      </div>
+      <h3>Buzzer Alert Patterns</h3>
+      <table class="info-table compact">
+        <tr><th>Event</th><th>Pattern</th><th>Sound</th></tr>
+        <tr><td>New Pothole</td><td>1.0s ON</td><td>Single long beep</td></tr>
+        <tr><td>Rough Road</td><td>0.5s ON, 0.2s OFF, 0.5s ON</td><td>Double beep</td></tr>
+        <tr><td>Verified</td><td>0.1s ON, 0.1s OFF, 0.1s ON</td><td>Quick double tap</td></tr>
+      </table>
+    </div>
+    <div class="col">
+      <h3>GPS Data Flow</h3>
+      <div class="code-block">
+NMEA Sentence:
+$GPGGA,123519,2314.1130,N,07216.0530,E,1,08,0.9,545.4,M,...
+
+Parsing Pipeline:
+1. Serial UART → readline()
+2. Split by comma
+3. DDDMM.MMMMM → Decimal Degrees
+4. lat = 23 + 14.1130/60 = 23.2352°
+5. lng = 72 + 16.0530/60 = 72.2676°
+      </div>
+      <h3>Hardware Wiring Summary</h3>
+      <table class="info-table compact">
+        <tr><th>Module</th><th>Interface</th><th>Pi Pin</th></tr>
+        <tr><td>Camera v2</td><td>CSI Ribbon</td><td>CSI Port</td></tr>
+        <tr><td>NEO-M8N GPS</td><td>UART</td><td>GPIO 14/15</td></tr>
+        <tr><td>MPU-9250</td><td>I²C</td><td>GPIO 2/3</td></tr>
+        <tr><td>Buzzer</td><td>GPIO</td><td>GPIO 13</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 6: COLLABORATIVE VERIFICATION ========== -->
+<section class="slide">
+  <h2 class="slide-title">Technical Approach — Collaborative Verification</h2>
+  <div class="two-col">
+    <div class="col">
+      <h3>Smart De-duplication Logic</h3>
+      <div class="flow-vertical">
+        <div class="flow-node flow-start">Vehicle Reports Pothole<br><small>(lat, lng, severity, confidence)</small></div>
+        <div class="flow-arrow-down">▼</div>
+        <div class="flow-node flow-decision">Server: Haversine check<br><small>Any active pothole within 30m?</small></div>
+        <div class="flow-branch">
+          <div class="flow-path">
+            <div class="flow-label-yes">YES</div>
+            <div class="flow-node flow-action-a">Verify Existing<br><small>verified_count++<br>Upgrade severity if worse</small></div>
+          </div>
+          <div class="flow-path">
+            <div class="flow-label-no">NO</div>
+            <div class="flow-node flow-action-b">Create New Record<br><small>INSERT into SQLite<br>status = 'active'</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <h3>Resolution Logic</h3>
+      <p>When a vehicle drives past a <em>known</em> pothole but the camera sees <strong>no pothole</strong>:</p>
+      <ol>
+        <li>Increment <code>absent_count</code></li>
+        <li>If absent_count ≥ threshold → mark as <strong>resolved</strong></li>
+        <li>Resolved potholes disappear from the dashboard</li>
+      </ol>
+      <h3>Haversine Distance Formula</h3>
+      <div class="code-block">
+d = 2R · arctan2(√a, √(1−a))
+
+where:
+  a = sin²(Δφ/2) + cos(φ₁)·cos(φ₂)·sin²(Δλ/2)
+  R = 6,371,000 m (Earth radius)
+  φ = latitude, λ = longitude
+
+Threshold: d < 30 m → same pothole
+      </div>
+      <h3>Why 30m Radius?</h3>
+      <p>GPS accuracy of NEO-M8N is ±2.5m (ideal). At 30 km/h city speed with 2s detection cooldown, vehicle travels ~17m per cycle. 30m covers positional uncertainty + vehicle displacement.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 7: IMPLEMENTATION — HARDWARE ========== -->
+<section class="slide">
+  <h2 class="slide-title">Implementation — Hardware</h2>
+  <div class="two-col">
+    <div class="col">
+      <h3>Bill of Materials</h3>
+      <table class="info-table">
+        <tr><th>#</th><th>Component</th><th>Cost (₹)</th></tr>
+        <tr><td>1</td><td>Raspberry Pi 4B (4GB)</td><td>4,500</td></tr>
+        <tr><td>2</td><td>Pi Camera v2</td><td>1,000</td></tr>
+        <tr><td>3</td><td>NEO-M8N GPS + Antenna</td><td>800</td></tr>
+        <tr><td>4</td><td>MPU-9250 IMU</td><td>350</td></tr>
+        <tr><td>5</td><td>Active Buzzer Module</td><td>50</td></tr>
+        <tr><td>6</td><td>64GB SD Card</td><td>450</td></tr>
+        <tr><td>7</td><td>5V 3A Power Supply</td><td>300</td></tr>
+        <tr><td>8</td><td>Pi 4 Case</td><td>250</td></tr>
+        <tr><td>9</td><td>Jumper Wires + Breadboard</td><td>110</td></tr>
+        <tr class="total-row"><td></td><td><strong>Total</strong></td><td><strong>₹7,810</strong></td></tr>
+      </table>
+    </div>
+    <div class="col">
+      <h3>Wiring Schematic</h3>
+      <div class="schematic">
+        <div class="sch-pi">
+          <div class="sch-header">Raspberry Pi 4 GPIO</div>
+          <div class="sch-pins">
+            <div class="sch-conn">
+              <span class="sch-pin">Pin 2 (5V)</span>
+              <span class="sch-wire">──→</span>
+              <span class="sch-device sch-gps">GPS VCC</span>
+            </div>
+            <div class="sch-conn">
+              <span class="sch-pin">Pin 10 (RXD)</span>
+              <span class="sch-wire">←──</span>
+              <span class="sch-device sch-gps">GPS TX</span>
+            </div>
+            <div class="sch-conn">
+              <span class="sch-pin">Pin 3 (SDA)</span>
+              <span class="sch-wire">──→</span>
+              <span class="sch-device sch-imu">IMU SDA</span>
+            </div>
+            <div class="sch-conn">
+              <span class="sch-pin">Pin 5 (SCL)</span>
+              <span class="sch-wire">──→</span>
+              <span class="sch-device sch-imu">IMU SCL</span>
+            </div>
+            <div class="sch-conn">
+              <span class="sch-pin">Pin 33 (GPIO 13)</span>
+              <span class="sch-wire">──→</span>
+              <span class="sch-device sch-buzz">Buzzer I/O</span>
+            </div>
+            <div class="sch-conn">
+              <span class="sch-pin">CSI Port</span>
+              <span class="sch-wire">──→</span>
+              <span class="sch-device sch-cam">Camera v2</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 8: IMPLEMENTATION — SOFTWARE ========== -->
+<section class="slide">
+  <h2 class="slide-title">Implementation — Software Stack</h2>
+  <div class="two-col">
+    <div class="col">
+      <h3>Software Architecture</h3>
+      <table class="info-table">
+        <tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr>
+        <tr><td>AI</td><td>Ultralytics YOLOv8</td><td>Object detection</td></tr>
+        <tr><td>Vision</td><td>OpenCV 4.x</td><td>Frame capture & display</td></tr>
+        <tr><td>Camera</td><td>Picamera2</td><td>CSI camera interface</td></tr>
+        <tr><td>GPS</td><td>pyserial + NMEA</td><td>Serial UART parsing</td></tr>
+        <tr><td>IMU</td><td>smbus2</td><td>I²C sensor reading</td></tr>
+        <tr><td>GPIO</td><td>RPi.GPIO</td><td>Buzzer control</td></tr>
+        <tr><td>Backend</td><td>Flask 3.1</td><td>REST API server</td></tr>
+        <tr><td>Database</td><td>SQLite (WAL)</td><td>Detection storage</td></tr>
+        <tr><td>Frontend</td><td>Vanilla JS + Google Maps</td><td>Dashboard UI</td></tr>
+        <tr><td>Networking</td><td>requests + CORS</td><td>Pi ↔ Server comms</td></tr>
+      </table>
+    </div>
+    <div class="col">
+      <h3>Codebase Structure</h3>
+      <div class="code-block">
+Pothole/
+├── raspberry_pi/          ~1,200 LOC
+│   ├── main.py            (3-thread loop)
+│   ├── pothole_detector.py(YOLO wrapper)
+│   ├── gps_reader.py      (NMEA parser)
+│   ├── buzzer.py           (GPIO alerts)
+│   ├── api_client.py       (HTTP + queue)
+│   └── config.py           (all settings)
+│
+├── server/                ~350 LOC
+│   └── app.py             (Flask REST API)
+│
+└── website/               ~4,700 LOC
+    ├── index.html          (Dashboard)
+    ├── admin.html          (Admin panel)
+    ├── styles.css          (~3,000 lines)
+    └── app_v16.js          (~1,400 lines)
+      </div>
+      <h3>Key Design Decision</h3>
+      <p><strong>Offline queue:</strong> When WiFi drops, detections are saved to <code>offline_queue.json</code> (max 1,000 entries) and auto-flushed when connectivity restores.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 9: THE DATA PROBLEM ========== -->
+<section class="slide">
+  <h2 class="slide-title">Validation — The Lab-to-Road Gap</h2>
+  <div class="two-col">
+    <div class="col">
+      <h3>Dataset Scaling (Lab)</h3>
+      <div class="chart-container">
+        <div class="bar-chart">
+          <div class="bar-group"><div class="bar" style="height:57%"><span>72%</span></div><div class="bar-label">2,000 imgs</div></div>
+          <div class="bar-group"><div class="bar" style="height:65%"><span>81%</span></div><div class="bar-label">3,000 imgs</div></div>
+          <div class="bar-group"><div class="bar bar-accent" style="height:73%"><span>91%</span></div><div class="bar-label">5,000 imgs</div></div>
+        </div>
+        <div class="chart-ylabel">Test Accuracy (%)</div>
+      </div>
+      <p class="note">Trained on clean, static images. Model scaled linearly with data volume.</p>
+    </div>
+    <div class="col">
+      <h3>Field Deployment — Reality Check</h3>
+      <div class="chart-container">
+        <div class="bar-chart">
+          <div class="bar-group"><div class="bar bar-accent" style="height:73%"><span>91%</span></div><div class="bar-label">Lab (Static)</div></div>
+          <div class="bar-group"><div class="bar bar-danger" style="height:34%"><span>42.5%</span></div><div class="bar-label">Motion Blur</div></div>
+          <div class="bar-group"><div class="bar bar-danger" style="height:28%"><span>35.2%</span></div><div class="bar-label">Dim Light</div></div>
+        </div>
+        <div class="chart-ylabel">Detection Accuracy (%)</div>
+      </div>
+      <div class="callout callout-danger">
+        <strong>Critical Finding:</strong> The 91% model was trained on pristine images. Moving vehicles introduce motion blur; Indian roads at dusk introduce low-light — accuracy collapsed by >50%.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 10: AUGMENTATION SOLUTION ========== -->
+<section class="slide">
+  <h2 class="slide-title">Validation — Data Augmentation Breakthrough</h2>
+  <div class="two-col">
+    <div class="col">
+      <h3>Augmentation Strategy</h3>
+      <div class="aug-pipeline">
+        <div class="aug-step">
+          <div class="aug-num">1</div>
+          <div class="aug-detail"><strong>Motion Blur Kernels</strong><br>Simulated 30-60 km/h vehicle motion across horizontal, vertical, and diagonal axes</div>
+        </div>
+        <div class="aug-step">
+          <div class="aug-num">2</div>
+          <div class="aug-detail"><strong>Brightness/Contrast Shift</strong><br>Random gamma correction (0.4–0.8) to simulate dusk and dawn lighting</div>
+        </div>
+        <div class="aug-step">
+          <div class="aug-num">3</div>
+          <div class="aug-detail"><strong>Combined Transforms</strong><br>Blur + dim applied together to simulate worst-case: moving car at sunset</div>
+        </div>
+      </div>
+      <div class="metric-box">
+        <div class="metric"><span class="metric-val">5,000</span><span class="metric-label">Original Images</span></div>
+        <div class="metric-arrow">→</div>
+        <div class="metric"><span class="metric-val">10,000+</span><span class="metric-label">After Augmentation</span></div>
+      </div>
+      <p class="note">Zero manual labeling — augmentations applied programmatically, preserving YOLO bounding-box annotations.</p>
+    </div>
+    <div class="col">
+      <h3>Before vs. After Augmentation</h3>
+      <div class="chart-container">
+        <div class="comparison-chart">
+          <div class="comp-row">
+            <span class="comp-label">Motion Blur</span>
+            <div class="comp-bars">
+              <div class="comp-bar comp-before" style="width:42.5%"><span>42.5%</span></div>
+              <div class="comp-bar comp-after" style="width:88%"><span>88%</span></div>
+            </div>
+          </div>
+          <div class="comp-row">
+            <span class="comp-label">Dim Light</span>
+            <div class="comp-bars">
+              <div class="comp-bar comp-before" style="width:35.2%"><span>35.2%</span></div>
+              <div class="comp-bar comp-after" style="width:85%"><span>85%</span></div>
+            </div>
+          </div>
+          <div class="comp-row">
+            <span class="comp-label">Combined</span>
+            <div class="comp-bars">
+              <div class="comp-bar comp-before" style="width:28%"><span>~28%</span></div>
+              <div class="comp-bar comp-after" style="width:79%"><span>~79%</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="comp-legend">
+          <span class="legend-item"><span class="legend-dot dot-before"></span>V1 (Before)</span>
+          <span class="legend-item"><span class="legend-dot dot-after"></span>V2 (After Augmentation)</span>
+        </div>
+      </div>
+      <div class="callout callout-success">
+        <strong>Result:</strong> Motion blur detection +45.5 pp. Dim light +49.8 pp. The model went from a lab prototype to a road-ready system.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 11: INFERENCE PERFORMANCE ========== -->
+<section class="slide">
+  <h2 class="slide-title">Validation — Hardware Performance</h2>
+  <div class="two-col">
+    <div class="col">
+      <h3>Inference Speed Comparison</h3>
+      <div class="chart-container">
+        <div class="bar-chart horizontal-chart">
+          <div class="hbar-group"><div class="hbar-label">Laptop GPU (GTX 1650)</div><div class="hbar" style="width:90%"><span>45 FPS</span></div></div>
+          <div class="hbar-group"><div class="hbar-label">Pi 4 + Coral TPU</div><div class="hbar bar-accent" style="width:50%"><span>25 FPS</span></div></div>
+          <div class="hbar-group"><div class="hbar-label">Pi 4 CPU (ARM)</div><div class="hbar" style="width:16%"><span>8 FPS</span></div></div>
+          <div class="hbar-group"><div class="hbar-label">Roboflow Cloud API</div><div class="hbar bar-warn" style="width:10%"><span>~5 FPS</span></div></div>
+        </div>
+      </div>
+      <p class="note"><strong>Trade-off:</strong> 8 FPS on bare Pi CPU is sufficient for city speeds (≤30 km/h). Adding a $25 Coral TPU enables highway-speed detection at 25 FPS.</p>
+    </div>
+    <div class="col">
+      <h3>System Latency Budget</h3>
+      <table class="info-table">
+        <tr><th>Component</th><th>Latency</th></tr>
+        <tr><td>Frame capture (Picamera2)</td><td>~10 ms</td></tr>
+        <tr><td>YOLOv8n inference (CPU)</td><td>~125 ms</td></tr>
+        <tr><td>GPS read (cached, non-blocking)</td><td>&lt; 1 ms</td></tr>
+        <tr><td>API POST to server</td><td>~50 ms (LAN)</td></tr>
+        <tr><td>Buzzer trigger (async thread)</td><td>&lt; 1 ms</td></tr>
+        <tr class="total-row"><td><strong>Total detection cycle</strong></td><td><strong>~190 ms</strong></td></tr>
+      </table>
+      <h3>Power Consumption</h3>
+      <table class="info-table compact">
+        <tr><th>Mode</th><th>Draw</th><th>10,000mAh Battery</th></tr>
+        <tr><td>Idle</td><td>~2.5W</td><td>~20 hours</td></tr>
+        <tr><td>YOLO Active</td><td>~7.5W</td><td>~3-4 hours</td></tr>
+        <tr><td>YOLO + Coral TPU</td><td>~10W</td><td>~2.5 hours</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 12: WEB DASHBOARD ========== -->
+<section class="slide">
+  <h2 class="slide-title">Implementation — Web Dashboard</h2>
+  <div class="two-col">
+    <div class="col">
+      <h3>Dashboard Features</h3>
+      <ul>
+        <li><strong>Google Maps</strong> with color-coded severity markers
+          <ul>
+            <li>🔴 Critical, 🟠 High, 🟡 Medium, 🟢 Low</li>
+          </ul>
+        </li>
+        <li><strong>Real-time stats:</strong> Active count, resolved, severity index, safety grade</li>
+        <li><strong>Live location tracking</strong> with GPS follow mode</li>
+        <li><strong>Directions panel</strong> with Google Places Autocomplete</li>
+        <li><strong>Route comparison:</strong> Car vs Bike travel time</li>
+        <li><strong>Dark/Light theme</strong> toggle</li>
+        <li><strong>Weather integration</strong> (MET Norway API)</li>
+        <li><strong>Admin panel:</strong> Edit, resolve, delete records</li>
+        <li><strong>Auto-refresh:</strong> 60-second polling cycle</li>
+      </ul>
+    </div>
+    <div class="col">
+      <h3>Dashboard Architecture</h3>
+      <div class="code-block">
+Frontend (Vanilla JS):
+├── Google Maps JavaScript API
+│   ├── Advanced Markers (severity pins)
+│   ├── Places API (autocomplete)
+│   └── Directions API (routing)
+├── Fetch API → Flask REST endpoints
+├── CSS: ~3,000 lines
+│   ├── Dark/Light themes (CSS vars)
+│   ├── Glassmorphism effects
+│   └── Responsive mobile layout
+└── Admin Panel (admin.html)
+    ├── CRUD operations on potholes
+    ├── Searchable table
+    └── Instant map sync on resolve
+      </div>
+      <h3>API Endpoints</h3>
+      <table class="info-table compact">
+        <tr><th>Method</th><th>Endpoint</th><th>Purpose</th></tr>
+        <tr><td>POST</td><td>/api/potholes</td><td>Report/verify</td></tr>
+        <tr><td>GET</td><td>/api/potholes</td><td>Filtered list</td></tr>
+        <tr><td>GET</td><td>/api/stats</td><td>Dashboard stats</td></tr>
+        <tr><td>POST</td><td>/api/potholes/:id/resolve</td><td>Mark fixed</td></tr>
+        <tr><td>POST</td><td>/api/seed</td><td>Demo data</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 13: CHALLENGES & DEBUGGING ========== -->
+<section class="slide">
+  <h2 class="slide-title">Challenges Encountered During Development</h2>
+  <div class="challenges-grid">
+    <div class="challenge-card">
+      <div class="ch-icon">🔵</div>
+      <h4>Blue Camera Tint</h4>
+      <p><strong>Problem:</strong> Picamera2 captured RGB; OpenCV expects BGR. Double color-swap produced blue-tinted frames.</p>
+      <p><strong>Fix:</strong> Changed capture format to <code>BGR888</code>, eliminated redundant <code>cvtColor()</code> call.</p>
+    </div>
+    <div class="challenge-card">
+      <div class="ch-icon">🔔</div>
+      <h4>Buzzer Won't Stop</h4>
+      <p><strong>Problem:</strong> Active buzzer module uses active-low logic. Setting GPIO HIGH = buzzing (opposite of expected).</p>
+      <p><strong>Fix:</strong> Switched to INPUT/OUTPUT mode toggling. INPUT = high-impedance = silent. OUTPUT LOW = buzzing.</p>
+    </div>
+    <div class="challenge-card">
+      <div class="ch-icon">🌡️</div>
+      <h4>Thermal Throttling</h4>
+      <p><strong>Problem:</strong> Pi 4 throttles CPU at 80°C during sustained YOLO inference. Detection speed dropped from 8→3 FPS.</p>
+      <p><strong>Fix:</strong> Added heatsinks + Pi case with passive ventilation. Implemented 2s cooldown to reduce sustained load.</p>
+    </div>
+    <div class="challenge-card">
+      <div class="ch-icon">📍</div>
+      <h4>GPS "No Fix" Indoors</h4>
+      <p><strong>Problem:</strong> NEO-M8N requires clear sky view. 30-90s cold start. No fix indoors = no geo-tagged detections.</p>
+      <p><strong>Fix:</strong> Added fallback: detections without GPS fix are logged locally but not sent to server. GPS status shown in UI overlay.</p>
+    </div>
+    <div class="challenge-card">
+      <div class="ch-icon">📂</div>
+      <h4>Wrong Model Path on Pi</h4>
+      <p><strong>Problem:</strong> Config pointed to training output path (<code>../runs/detect/.../best.pt</code>) which doesn't exist on Pi.</p>
+      <p><strong>Fix:</strong> Reverted to relative <code>best.pt</code> in same directory. Model load failure caused zero detections (silent failure).</p>
+    </div>
+    <div class="challenge-card">
+      <div class="ch-icon">📶</div>
+      <h4>WiFi Drops in Vehicle</h4>
+      <p><strong>Problem:</strong> Moving vehicle exits WiFi range. HTTP requests fail, detections lost.</p>
+      <p><strong>Fix:</strong> Implemented offline queue (<code>offline_queue.json</code>). Auto-flushes when connectivity restores. Max 1,000 buffered entries.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 14: LIMITATIONS ========== -->
+<section class="slide">
+  <h2 class="slide-title">Limitations & Future Work</h2>
+  <div class="two-col">
+    <div class="col">
+      <h3>Current Limitations</h3>
+      <table class="info-table">
+        <tr><th>Limitation</th><th>Impact</th></tr>
+        <tr><td>No nighttime capability</td><td>Camera unusable without headlight illumination</td></tr>
+        <tr><td>Single-class detection</td><td>Only potholes; no cracks, speed bumps, or debris</td></tr>
+        <tr><td>No pothole depth estimation</td><td>2D camera cannot measure depth; severity is only by area</td></tr>
+        <tr><td>WiFi-dependent connectivity</td><td>No cellular fallback for rural/highway use</td></tr>
+        <tr><td>8 FPS on bare Pi CPU</td><td>May miss potholes at highway speeds (&gt;60 km/h)</td></tr>
+        <tr><td>No multi-modal confirmation</td><td>Camera and IMU are independent; false positives from shadows/leaves</td></tr>
+        <tr><td>Single-vehicle tested</td><td>Collaborative verification not tested at fleet scale</td></tr>
+      </table>
+    </div>
+    <div class="col">
+      <h3>Proposed Improvements</h3>
+      <ul>
+        <li><strong>Night Vision:</strong> CLAHE pre-processing or IR camera for nighttime detection</li>
+        <li><strong>Multi-Modal Fusion:</strong> Only report pothole if camera AND IMU both confirm — reduce false positives</li>
+        <li><strong>Coral TPU Integration:</strong> $25 accelerator → 25 FPS, enabling highway deployment</li>
+        <li><strong>4G/LTE Module:</strong> Replace WiFi with cellular for continuous rural connectivity</li>
+        <li><strong>LiDAR Depth Sensing:</strong> 1D LiDAR (Garmin Lidar-Lite) for actual pothole depth measurement</li>
+        <li><strong>Comfort Routing:</strong> Route planning that minimizes exposure to pothole-dense zones</li>
+        <li><strong>Voice Alerts:</strong> TTS engine for context-aware warnings ("Critical pothole in 50m")</li>
+        <li><strong>Automated Municipal Reports:</strong> PDF generation with GPS, severity, and timestamps</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SLIDE 15: KEY TAKEAWAY ========== -->
+<section class="slide" data-bg="dark">
+  <div class="center-content">
+    <h2 class="slide-title takeaway-title">Key Takeaway</h2>
+    <div class="takeaway-box">
+      <p class="takeaway-text">RoadGuard demonstrates that <strong>real-time, edge-deployed pothole detection</strong> is feasible on a sub-₹8,000 Raspberry Pi platform. The critical engineering contribution was solving the <strong>lab-to-road accuracy gap</strong> through targeted data augmentation — recovering from a 42.5% field accuracy to 88% — making the system viable for deployment on Indian roads.</p>
+    </div>
+    <div class="takeaway-metrics">
+      <div class="tk-metric">
+        <span class="tk-val">88%</span>
+        <span class="tk-label">Field Accuracy (V2)</span>
+      </div>
+      <div class="tk-metric">
+        <span class="tk-val">8 FPS</span>
+        <span class="tk-label">Real-Time on Pi CPU</span>
+      </div>
+      <div class="tk-metric">
+        <span class="tk-val">₹7,810</span>
+        <span class="tk-label">Total Hardware Cost</span>
+      </div>
+      <div class="tk-metric">
+        <span class="tk-val">190 ms</span>
+        <span class="tk-label">Detection Latency</span>
+      </div>
+    </div>
+    <p class="takeaway-closing">Engineering is 20% about solving the core problem and 80% about handling the "what-ifs."<br>Building a prototype that works on a desk is easy; building one that survives a moving vehicle is where real engineering begins.</p>
+  </div>
+</section>
+
+</div><!-- end .deck -->
+
+<script src="slides.js"></script>
+</body>
+</html>
