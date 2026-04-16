@@ -71,7 +71,7 @@ class RoadGuardSystem:
             from picamera2 import Picamera2
             self.picam2 = Picamera2()
             config = self.picam2.create_preview_configuration(
-                main={"format": "RGB888", "size": (640, 480)}
+                main={"format": "BGR888", "size": (640, 480)}
             )
             self.picam2.configure(config)
             self.picam2.start()
@@ -195,8 +195,9 @@ class RoadGuardSystem:
             while not self.shutdown_event.is_set():
                 # 1. Capture frame (fast — just grabs from camera buffer)
                 try:
-                    frame_rgb = self.picam2.capture_array()
-                    frame = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
+                    raw_frame = self.picam2.capture_array()
+                    # Explicitly swap Red and Blue channels to fix the color issue
+                    frame = cv2.cvtColor(raw_frame, cv2.COLOR_BGR2RGB)
                     self.latest_frame = frame
                 except Exception as e:
                     logger.error(f"Capture error: {e}")

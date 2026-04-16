@@ -2,6 +2,10 @@
 Buzzer Alert Module — GPIO Buzzer Control
 Provides different alert patterns for pothole detections.
 Guarantees buzzer is OFF at initialization and cleanup.
+
+This module controls a 3-pin active buzzer module (VCC=5V, GND, I/O)
+by toggling the GPIO pin between INPUT mode (high-impedance = silent)
+and OUTPUT LOW mode (current sink = buzzing).
 """
 
 import time
@@ -21,10 +25,10 @@ except ImportError:
 class Buzzer:
     """Controls a GPIO buzzer with different alert patterns."""
 
-    def __init__(self, pin=18, cooldown=2.0):
+    def __init__(self, pin=13, cooldown=2.0):
         """
         Initialize buzzer. Guarantees buzzer is OFF after init.
-        
+
         Args:
             pin: BCM GPIO pin number the buzzer is connected to
             cooldown: Minimum seconds between alerts to prevent spam
@@ -40,12 +44,9 @@ class Buzzer:
             try:
                 GPIO.setwarnings(False)
                 GPIO.setmode(GPIO.BCM)
-                GPIO.setup(self.pin, GPIO.OUT, initial=GPIO.LOW)
-                # Double-ensure OFF state
-                GPIO.output(self.pin, GPIO.LOW)
-                time.sleep(0.05)
-                GPIO.output(self.pin, GPIO.LOW)
-                logger.info(f"Buzzer initialized on GPIO pin {pin} (OFF)")
+                # Set as INPUT (high-impedance) = buzzer OFF (like disconnecting the wire)
+                GPIO.setup(self.pin, GPIO.IN)
+                logger.info(f"Buzzer initialized on GPIO {pin} — SILENT (INPUT mode)")
             except Exception as e:
                 logger.error(f"Buzzer GPIO setup failed: {e}")
         else:
@@ -56,14 +57,15 @@ class Buzzer:
         self._playing = False
         if GPIO_AVAILABLE:
             try:
-                GPIO.output(self.pin, GPIO.LOW)
+                # INPUT mode = high-impedance = pin is "disconnected" = buzzer silent
+                GPIO.setup(self.pin, GPIO.IN)
             except Exception:
                 pass
 
     def alert_pothole(self, pattern=None):
         """
         Play pothole alert pattern.
-        
+
         Args:
             pattern: List of (on_seconds, off_seconds) tuples.
                      Default: [(1.0, 0.0)] — single 1-second buzz
@@ -75,7 +77,7 @@ class Buzzer:
     def alert_animal(self, pattern=None):
         """
         Play animal alert pattern (double long beep).
-        
+
         Args:
             pattern: List of (on_seconds, off_seconds) tuples.
                      Default: [(0.5, 0.2), (0.5, 0.5)]
@@ -123,20 +125,21 @@ class Buzzer:
                 self._playing = False
 
     def _buzzer_on(self):
-        """Turn buzzer ON."""
+        """Turn buzzer ON — switch pin to OUTPUT LOW (current sink)."""
         if GPIO_AVAILABLE:
             try:
-                GPIO.output(self.pin, GPIO.HIGH)
+                GPIO.setup(self.pin, GPIO.OUT)
+                GPIO.output(self.pin, GPIO.LOW)
             except Exception:
                 pass
         else:
             logger.debug("BEEP (simulated)")
 
     def _buzzer_off(self):
-        """Turn buzzer OFF."""
+        """Turn buzzer OFF — switch pin to INPUT (high-impedance = disconnected)."""
         if GPIO_AVAILABLE:
             try:
-                GPIO.output(self.pin, GPIO.LOW)
+                GPIO.setup(self.pin, GPIO.IN)
             except Exception:
                 pass
 
@@ -157,19 +160,28 @@ class Buzzer:
 # ─── Standalone test ─────────────────────────────────────────
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    from config import BUZZER_GPIO_PIN, BUZZER_COOLDOWN
 
-    buzzer = Buzzer(pin=BUZZER_GPIO_PIN, cooldown=BUZZER_COOLDOWN)
+    print("=" * 50)
+    print("  BUZZER TEST — INPUT/OUTPUT toggle method")
+    print("  VCC=5V, GND=GND, I/O=Pin33 (GPIO13)")
+    print("=" * 50)
 
-    print("Testing buzzer alerts...")
-    print("1. Pothole alert (1-second buzz)")
-    buzzer.alert_pothole()
-    time.sleep(3)
+    buzzer = Buzzer(pin=13, cooldown=0)
 
-    print("2. Animal alert (double long beep)")
-    buzzer.cooldown = 0  # Disable cooldown for test
-    buzzer.alert_animal()
+    print("\n1. Buzzer should be SILENT right now.")
+    input("   Press Enter to test a 1-second beep...")
+
+    buzzer._buzzer_on()
+    print("   -> BEEP! (1 second)")
+    time.sleep(1.0)
+    buzzer._buzzer_off()
+    print("   -> Silent.")
+
+    time.sleep(1)
+
+    print("\n2. Testing alert_pothole pattern...")
+    buzzer.alert_pothole([(1.0, 0.0)])
     time.sleep(3)
 
     buzzer.cleanup()
-    print("Done.")
+    print("\nDone. Buzzer should be completely silent now.")

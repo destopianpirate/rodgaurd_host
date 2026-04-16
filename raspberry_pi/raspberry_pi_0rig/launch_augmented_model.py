@@ -16,6 +16,12 @@ import sys
 import time
 import logging
 import threading
+import cv2
+import numpy as np
+
+# ─── RoadGuard Modules ──────────────────────────────────────
+from config import BUZZER_GPIO_PIN, BUZZER_COOLDOWN, BUZZER_PATTERN_POTHOLE
+from buzzer import Buzzer
 
 # ─── Setup Logging ──────────────────────────────────────────
 logging.basicConfig(
@@ -85,6 +91,7 @@ def main():
 
     # ── Detection Config ─────────────────────────────────────
     CONFIDENCE_THRESHOLD = 0.5
+    DETECTION_COOLDOWN = 2.0  # seconds to wait after a detection
     SEVERITY_THRESHOLDS = {"critical": 0.15, "high": 0.08, "medium": 0.03}
 
     SEVERITY_COLORS = {
@@ -117,6 +124,15 @@ def main():
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     logger.info("📷 Camera opened. Press 'q' in the video window to quit.\n")
+
+    # ── Initialize Buzzer ────────────────────────────────────
+    buzzer = None
+    try:
+        buzzer = Buzzer(BUZZER_GPIO_PIN, BUZZER_COOLDOWN)
+        buzzer.force_off()
+        logger.info("🔔 Buzzer initialized: OK")
+    except Exception as e:
+        logger.warning(f"⚠️ Buzzer initialization failed: {e}")
 
     # ── Threaded Architecture (same as pothole_detector.py) ──
     latest_frame = None
@@ -178,6 +194,13 @@ def main():
                 if dets:
                     summary = [(d['class_name'], d['severity'], f"{d['confidence']:.0%}") for d in dets]
                     logger.info(f"Detected {len(dets)} pothole(s): {summary}")
+                    
+                    # Trigger buzzer alert
+                    if buzzer:
+                        buzzer.alert_pothole(BUZZER_PATTERN_POTHOLE)
+                    
+                    # 2-second cooldown (just like main.py)
+                    time.sleep(DETECTION_COOLDOWN)
             except Exception as e:
                 logger.error(f"Detection error: {e}")
 
@@ -224,6 +247,8 @@ def main():
     # ── Cleanup ──────────────────────────────────────────────
     cap.release()
     cv2.destroyAllWindows()
+    if buzzer:
+        buzzer.cleanup()
     logger.info("👋 Augmented model launcher shut down.")
 
 

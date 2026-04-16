@@ -42,7 +42,7 @@ GPS_BAUD_RATE = 9600
 GPS_READ_INTERVAL = 1.0
 
 # ─── Buzzer (GPIO) ──────────────────────────────────────────
-BUZZER_GPIO_PIN = 18
+BUZZER_GPIO_PIN = 13
 BUZZER_PATTERN_POTHOLE = [(1.0, 0.0)]                             # Pothole: single 1-second buzz
 BUZZER_PATTERN_ANIMAL = [(0.5, 0.2), (0.5, 0.5)]                 # Animal: double long beep
 BUZZER_PATTERN_VERIFIED = [(0.1, 0.1), (0.1, 0.3)]               # Verified: double short beep

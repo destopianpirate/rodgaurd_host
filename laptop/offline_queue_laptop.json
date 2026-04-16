@@ -1,1 +1,58 @@
-[]
+[
+  {
+    "endpoint": "potholes",
+    "data": {
+      "lat": 23.2179475037541,
+      "lng": 72.68186877708054,
+      "severity": "low",
+      "confidence": 0.647,
+      "description": "Laptop auto-detected (pothole)",
+      "image_url": "",
+      "vehicle_id": "laptop-001",
+      "detected_at": "2026-04-15T23:42:18"
+    },
+    "queued_at": "2026-04-15T23:42:23"
+  },
+  {
+    "endpoint": "potholes",
+    "data": {
+      "lat": 23.216574078319308,
+      "lng": 72.68253832808674,
+      "severity": "low",
+      "confidence": 0.893,
+      "description": "Laptop auto-detected (pothole)",
+      "image_url": "",
+      "vehicle_id": "laptop-001",
+      "detected_at": "2026-04-15T23:42:25"
+    },
+    "queued_at": "2026-04-15T23:42:30"
+  },
+  {
+    "endpoint": "potholes",
+    "data": {
+      "lat": 23.217679538188598,
+      "lng": 72.68463821762509,
+      "severity": "low",
+      "confidence": 0.763,
+      "description": "Laptop auto-detected (pothole)",
+      "image_url": "",
+      "vehicle_id": "laptop-001",
+      "detected_at": "2026-04-15T23:42:39"
+    },
+    "queued_at": "2026-04-15T23:42:43"
+  },
+  {
+    "endpoint": "potholes",
+    "data": {
+      "lat": 23.21640106390805,
+      "lng": 72.68451134650768,
+      "severity": "low",
+      "confidence": 0.779,
+      "description": "Laptop auto-detected (pothole)",
+      "image_url": "",
+      "vehicle_id": "laptop-001",
+      "detected_at": "2026-04-15T23:43:02"
+    },
+    "queued_at": "2026-04-15T23:43:07"
+  }
+]

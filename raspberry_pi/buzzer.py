@@ -37,7 +37,7 @@ class Buzzer:
 
         if GPIOZERO_AVAILABLE:
             try:
-                self._buzzer = GpioBuzzer(self.pin)
+                self._buzzer = GpioBuzzer(self.pin, active_high=False)
                 logger.info(f"Buzzer initialized on GPIO pin {pin} using gpiozero")
             except Exception as e:
                 logger.error(f"Buzzer GPIO setup failed: {e}")
