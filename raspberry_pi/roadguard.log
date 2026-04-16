@@ -22967,3 +22967,348 @@
 2026-03-03 20:11:38,473 [WARNING] gps_reader: GPS serial not connected
 2026-03-03 20:11:38,531 [WARNING] gps_reader: GPS serial not connected
 2026-03-03 20:11:38,597 [WARNING] gps_reader: GPS serial not connected
+2026-04-10 22:04:23,564 [INFO] RoadGuard: ============================================================
+2026-04-10 22:04:23,565 [INFO] RoadGuard:   RoadGuard v2.0 — Collaborative Pothole Verification
+2026-04-10 22:04:23,565 [INFO] RoadGuard:   Vehicle ID: car-001
+2026-04-10 22:04:23,566 [INFO] RoadGuard: ============================================================
+2026-04-10 22:04:23,608 [INFO] RoadGuard: 📷 Camera: ✅ (640x480)
+2026-04-10 22:04:23,869 [INFO] pothole_detector: YOLO model loaded: best.pt
+2026-04-10 22:04:23,870 [INFO] pothole_detector: Model classes: {0: 'Pothole - v1 2024-02-20 5-25pm'}
+2026-04-10 22:04:23,870 [INFO] RoadGuard: 🕳️  Detector: ✅
+2026-04-10 22:04:23,887 [ERROR] thermal_detector: Failed to initialize MLX90640: No Hardware I2C on (scl,sda)=(3, 2)
+Valid I2C ports: ((1, 3, 2), (0, 1, 0), (10, 45, 44)).
+Make sure I2C is enabled.
+2026-04-10 22:04:23,887 [INFO] RoadGuard: 🌡️  Thermal: ⚠️ Sim mode
+2026-04-10 22:04:23,888 [INFO] gps_reader: GPS connected on /dev/ttyS0 at 9600 baud
+2026-04-10 22:04:23,888 [INFO] RoadGuard: 📍 GPS: ✅
+2026-04-10 22:04:23,889 [INFO] buzzer: Buzzer initialized on GPIO pin 18
+2026-04-10 22:04:23,889 [INFO] RoadGuard: 🔔 Buzzer: ✅
+2026-04-10 22:04:23,937 [INFO] RoadGuard: 🌐 Server: ⚠️ Offline
+2026-04-10 22:04:23,937 [INFO] RoadGuard: ------------------------------------------------------------
+2026-04-10 22:04:23,938 [INFO] RoadGuard:   Nearby check radius: 150m
+2026-04-10 22:04:23,938 [INFO] RoadGuard:   Nearby check interval: 5.0s
+2026-04-10 22:04:23,938 [INFO] RoadGuard:   Capture interval: 0.033s
+2026-04-10 22:04:23,938 [INFO] RoadGuard: ------------------------------------------------------------
+2026-04-10 22:04:23,938 [INFO] RoadGuard: 🚗 Driving... Press Ctrl+C to stop.
+
+2026-04-10 22:06:31,314 [INFO] RoadGuard: Shutdown signal received...
+2026-04-10 22:06:34,265 [INFO] RoadGuard: 
+🛑 Shutting down RoadGuard...
+2026-04-10 22:06:34,268 [INFO] gps_reader: GPS disconnected
+2026-04-10 22:06:34,268 [INFO] buzzer: Buzzer GPIO cleaned up
+2026-04-10 22:06:34,269 [INFO] RoadGuard: 
+📊 Session Summary:
+2026-04-10 22:06:34,269 [INFO] RoadGuard:   New potholes reported: 0
+2026-04-10 22:06:34,269 [INFO] RoadGuard:   Potholes verified:     0
+2026-04-10 22:06:34,270 [INFO] RoadGuard:   Potholes resolved:     0
+2026-04-10 22:06:34,270 [INFO] RoadGuard:   Animals detected:      0
+2026-04-10 22:06:34,271 [INFO] RoadGuard:   Offline queue:         0 pending
+2026-04-10 22:06:34,271 [INFO] RoadGuard: Goodbye! 👋
+
+2026-04-10 22:06:46,975 [INFO] RoadGuard: ============================================================
+2026-04-10 22:06:46,975 [INFO] RoadGuard:   RoadGuard v2.0 — Collaborative Pothole Verification
+2026-04-10 22:06:46,976 [INFO] RoadGuard:   Vehicle ID: car-001
+2026-04-10 22:06:46,976 [INFO] RoadGuard: ============================================================
+2026-04-10 22:06:46,983 [INFO] RoadGuard: 📷 Camera: ✅ (640x480)
+2026-04-10 22:06:47,154 [INFO] pothole_detector: YOLO model loaded: best.pt
+2026-04-10 22:06:47,154 [INFO] pothole_detector: Model classes: {0: 'Pothole - v1 2024-02-20 5-25pm'}
+2026-04-10 22:06:47,155 [INFO] RoadGuard: 🕳️  Detector: ✅
+2026-04-10 22:06:47,161 [ERROR] thermal_detector: Failed to initialize MLX90640: No Hardware I2C on (scl,sda)=(3, 2)
+Valid I2C ports: ((1, 3, 2), (0, 1, 0), (10, 45, 44)).
+Make sure I2C is enabled.
+2026-04-10 22:06:47,161 [INFO] RoadGuard: 🌡️  Thermal: ⚠️ Sim mode
+2026-04-10 22:06:47,163 [INFO] gps_reader: GPS connected on /dev/ttyS0 at 9600 baud
+2026-04-10 22:06:47,163 [INFO] RoadGuard: 📍 GPS: ✅
+2026-04-10 22:06:47,164 [INFO] buzzer: Buzzer initialized on GPIO pin 18
+2026-04-10 22:06:47,164 [INFO] RoadGuard: 🔔 Buzzer: ✅
+2026-04-10 22:06:47,190 [INFO] RoadGuard: 🌐 Server: ⚠️ Offline
+2026-04-10 22:06:47,191 [INFO] RoadGuard: ------------------------------------------------------------
+2026-04-10 22:06:47,191 [INFO] RoadGuard:   Nearby check radius: 150m
+2026-04-10 22:06:47,191 [INFO] RoadGuard:   Nearby check interval: 5.0s
+2026-04-10 22:06:47,191 [INFO] RoadGuard:   Capture interval: 0.033s
+2026-04-10 22:06:47,191 [INFO] RoadGuard: ------------------------------------------------------------
+2026-04-10 22:06:47,192 [INFO] RoadGuard: 🚗 Driving... Press Ctrl+C to stop.
+
+2026-04-10 22:35:36,863 [INFO] RoadGuard: Shutdown signal received...
+2026-04-10 22:35:41,501 [INFO] RoadGuard: 
+🛑 Shutting down RoadGuard...
+2026-04-10 22:35:41,504 [INFO] gps_reader: GPS disconnected
+2026-04-10 22:35:41,504 [INFO] buzzer: Buzzer GPIO cleaned up
+2026-04-10 22:35:41,506 [INFO] RoadGuard: 
+📊 Session Summary:
+2026-04-10 22:35:41,506 [INFO] RoadGuard:   New potholes reported: 0
+2026-04-10 22:35:41,506 [INFO] RoadGuard:   Potholes verified:     0
+2026-04-10 22:35:41,506 [INFO] RoadGuard:   Potholes resolved:     0
+2026-04-10 22:35:41,506 [INFO] RoadGuard:   Animals detected:      0
+2026-04-10 22:35:41,507 [INFO] RoadGuard:   Offline queue:         0 pending
+2026-04-10 22:35:41,507 [INFO] RoadGuard: Goodbye! 👋
+
+2026-04-10 22:35:54,626 [INFO] RoadGuard: ============================================================
+2026-04-10 22:35:54,626 [INFO] RoadGuard:   RoadGuard v2.0 — Collaborative Pothole Verification
+2026-04-10 22:35:54,627 [INFO] RoadGuard:   Vehicle ID: car-001
+2026-04-10 22:35:54,627 [INFO] RoadGuard: ============================================================
+2026-04-10 22:35:54,643 [INFO] RoadGuard: 📷 Camera: ✅ (640x480)
+2026-04-10 22:35:54,884 [INFO] pothole_detector: YOLO model loaded: best.pt
+2026-04-10 22:35:54,885 [INFO] pothole_detector: Model classes: {0: 'Pothole - v1 2024-02-20 5-25pm'}
+2026-04-10 22:35:54,885 [INFO] RoadGuard: 🕳️  Detector: ✅
+2026-04-10 22:35:54,891 [ERROR] thermal_detector: Failed to initialize MLX90640: No Hardware I2C on (scl,sda)=(3, 2)
+Valid I2C ports: ((1, 3, 2), (0, 1, 0), (10, 45, 44)).
+Make sure I2C is enabled.
+2026-04-10 22:35:54,892 [INFO] RoadGuard: 🌡️  Thermal: ⚠️ Sim mode
+2026-04-10 22:35:54,893 [INFO] gps_reader: GPS connected on /dev/ttyS0 at 9600 baud
+2026-04-10 22:35:54,894 [INFO] RoadGuard: 📍 GPS: ✅
+2026-04-10 22:35:54,894 [INFO] buzzer: Buzzer initialized on GPIO pin 18
+2026-04-10 22:35:54,894 [INFO] RoadGuard: 🔔 Buzzer: ✅
+2026-04-10 22:35:54,914 [INFO] RoadGuard: 🌐 Server: ⚠️ Offline
+2026-04-10 22:35:54,915 [INFO] RoadGuard: ------------------------------------------------------------
+2026-04-10 22:35:54,915 [INFO] RoadGuard:   Nearby check radius: 150m
+2026-04-10 22:35:54,915 [INFO] RoadGuard:   Nearby check interval: 5.0s
+2026-04-10 22:35:54,915 [INFO] RoadGuard:   Capture interval: 0.033s
+2026-04-10 22:35:54,916 [INFO] RoadGuard: ------------------------------------------------------------
+2026-04-10 22:35:54,916 [INFO] RoadGuard: 🚗 Driving... Press Ctrl+C to stop.
+
+2026-04-10 22:36:19,246 [INFO] RoadGuard: Shutdown signal received...
+2026-04-10 22:36:24,986 [INFO] RoadGuard: 
+🛑 Shutting down RoadGuard...
+2026-04-10 22:36:24,992 [INFO] gps_reader: GPS disconnected
+2026-04-10 22:36:24,993 [INFO] buzzer: Buzzer GPIO cleaned up
+2026-04-10 22:36:24,994 [INFO] RoadGuard: 
+📊 Session Summary:
+2026-04-10 22:36:24,994 [INFO] RoadGuard:   New potholes reported: 0
+2026-04-10 22:36:24,994 [INFO] RoadGuard:   Potholes verified:     0
+2026-04-10 22:36:24,994 [INFO] RoadGuard:   Potholes resolved:     0
+2026-04-10 22:36:24,995 [INFO] RoadGuard:   Animals detected:      0
+2026-04-10 22:36:24,995 [INFO] RoadGuard:   Offline queue:         0 pending
+2026-04-10 22:36:24,995 [INFO] RoadGuard: Goodbye! 👋
+
+2026-04-10 22:40:10,328 [INFO] RoadGuard: ============================================================
+2026-04-10 22:40:10,328 [INFO] RoadGuard:   RoadGuard v2.0 — Collaborative Pothole Verification
+2026-04-10 22:40:10,329 [INFO] RoadGuard:   Vehicle ID: car-001
+2026-04-10 22:40:10,329 [INFO] RoadGuard: ============================================================
+2026-04-10 22:40:10,349 [INFO] RoadGuard: 📷 Camera: ✅ (640x480)
+2026-04-10 22:40:10,614 [INFO] pothole_detector: YOLO model loaded: best.pt
+2026-04-10 22:40:10,615 [INFO] pothole_detector: Model classes: {0: 'Pothole - v1 2024-02-20 5-25pm'}
+2026-04-10 22:40:10,615 [INFO] RoadGuard: 🕳️  Detector: ✅
+2026-04-10 22:40:10,621 [ERROR] thermal_detector: Failed to initialize MLX90640: No Hardware I2C on (scl,sda)=(3, 2)
+Valid I2C ports: ((1, 3, 2), (0, 1, 0), (10, 45, 44)).
+Make sure I2C is enabled.
+2026-04-10 22:40:10,624 [INFO] RoadGuard: 🌡️  Thermal: ⚠️ Sim mode
+2026-04-10 22:40:10,625 [INFO] gps_reader: GPS connected on /dev/ttyS0 at 9600 baud
+2026-04-10 22:40:10,625 [INFO] RoadGuard: 📍 GPS: ✅
+2026-04-10 22:40:10,626 [INFO] buzzer: Buzzer initialized on GPIO pin 18
+2026-04-10 22:40:10,626 [INFO] RoadGuard: 🔔 Buzzer: ✅
+2026-04-10 22:40:10,671 [INFO] RoadGuard: 🌐 Server: ⚠️ Offline
+2026-04-10 22:40:10,671 [INFO] RoadGuard: ------------------------------------------------------------
+2026-04-10 22:40:10,671 [INFO] RoadGuard:   Nearby check radius: 150m
+2026-04-10 22:40:10,671 [INFO] RoadGuard:   Nearby check interval: 5.0s
+2026-04-10 22:40:10,672 [INFO] RoadGuard:   Capture interval: 0.033s
+2026-04-10 22:40:10,672 [INFO] RoadGuard: ------------------------------------------------------------
+2026-04-10 22:40:10,672 [INFO] RoadGuard: 🚗 Driving... Press Ctrl+C to stop.
+
+2026-04-10 22:48:00,481 [INFO] RoadGuard: Shutdown signal received...
+2026-04-10 22:48:01,847 [INFO] RoadGuard: 
+🛑 Shutting down RoadGuard...
+2026-04-10 22:48:01,858 [INFO] gps_reader: GPS disconnected
+2026-04-10 22:48:01,858 [INFO] buzzer: Buzzer GPIO cleaned up
+2026-04-10 22:48:01,859 [INFO] RoadGuard: 
+📊 Session Summary:
+2026-04-10 22:48:01,859 [INFO] RoadGuard:   New potholes reported: 0
+2026-04-10 22:48:01,860 [INFO] RoadGuard:   Potholes verified:     0
+2026-04-10 22:48:01,860 [INFO] RoadGuard:   Potholes resolved:     0
+2026-04-10 22:48:01,861 [INFO] RoadGuard:   Animals detected:      0
+2026-04-10 22:48:01,861 [INFO] RoadGuard:   Offline queue:         0 pending
+2026-04-10 22:48:01,862 [INFO] RoadGuard: Goodbye! 👋
+
+2026-04-10 22:48:12,379 [INFO] RoadGuard: ============================================================
+2026-04-10 22:48:12,380 [INFO] RoadGuard:   RoadGuard v2.0 — Collaborative Pothole Verification
+2026-04-10 22:48:12,380 [INFO] RoadGuard:   Vehicle ID: car-001
+2026-04-10 22:48:12,381 [INFO] RoadGuard: ============================================================
+2026-04-10 22:48:12,389 [INFO] RoadGuard: 📷 Camera: ✅ (640x480)
+2026-04-10 22:48:12,590 [INFO] pothole_detector: YOLO model loaded: best.pt
+2026-04-10 22:48:12,590 [INFO] pothole_detector: Model classes: {0: 'Pothole - v1 2024-02-20 5-25pm'}
+2026-04-10 22:48:12,590 [INFO] RoadGuard: 🕳️  Detector: ✅
+2026-04-10 22:48:12,591 [INFO] gps_reader: GPS connected on /dev/ttyS0 at 9600 baud
+2026-04-10 22:48:12,592 [INFO] RoadGuard: 📍 GPS: ✅
+2026-04-10 22:48:12,592 [INFO] buzzer: Buzzer initialized on GPIO pin 18
+2026-04-10 22:48:12,592 [INFO] RoadGuard: 🔔 Buzzer: ✅
+2026-04-10 22:48:12,607 [INFO] RoadGuard: 🌐 Server: ⚠️ Offline
+2026-04-10 22:48:12,607 [INFO] RoadGuard: ------------------------------------------------------------
+2026-04-10 22:48:12,608 [INFO] RoadGuard:   Nearby check radius: 150m
+2026-04-10 22:48:12,608 [INFO] RoadGuard:   Nearby check interval: 5.0s
+2026-04-10 22:48:12,608 [INFO] RoadGuard:   Capture interval: 0.033s
+2026-04-10 22:48:12,608 [INFO] RoadGuard: ------------------------------------------------------------
+2026-04-10 22:48:12,608 [INFO] RoadGuard: 🚗 Driving... Press Ctrl+C to stop.
+
+2026-04-10 22:49:28,022 [INFO] RoadGuard: Shutdown signal received...
+2026-04-10 22:49:32,786 [INFO] RoadGuard: 
+🛑 Shutting down RoadGuard...
+2026-04-10 22:49:32,789 [INFO] gps_reader: GPS disconnected
+2026-04-10 22:49:32,789 [INFO] buzzer: Buzzer GPIO cleaned up
+2026-04-10 22:49:32,789 [INFO] RoadGuard: 
+📊 Session Summary:
+2026-04-10 22:49:32,790 [INFO] RoadGuard:   New potholes reported: 0
+2026-04-10 22:49:32,790 [INFO] RoadGuard:   Potholes verified:     0
+2026-04-10 22:49:32,790 [INFO] RoadGuard:   Potholes resolved:     0
+2026-04-10 22:49:32,791 [INFO] RoadGuard:   Offline queue:         0 pending
+2026-04-10 22:49:32,791 [INFO] RoadGuard: Goodbye! 👋
+
+2026-04-10 22:51:57,105 [INFO] RoadGuard: ============================================================
+2026-04-10 22:51:57,105 [INFO] RoadGuard:   RoadGuard v2.0 — Collaborative Pothole Verification
+2026-04-10 22:51:57,105 [INFO] RoadGuard:   Vehicle ID: car-001
+2026-04-10 22:51:57,106 [INFO] RoadGuard: ============================================================
+2026-04-10 22:51:57,119 [INFO] RoadGuard: 📷 Camera: ✅ (640x480)
+2026-04-10 22:51:57,288 [INFO] pothole_detector: YOLO model loaded: best.pt
+2026-04-10 22:51:57,289 [INFO] pothole_detector: Model classes: {0: 'Pothole - v1 2024-02-20 5-25pm'}
+2026-04-10 22:51:57,289 [INFO] RoadGuard: 🕳️  Detector: ✅
+2026-04-10 22:51:57,290 [INFO] gps_reader: GPS connected on /dev/ttyS0 at 9600 baud
+2026-04-10 22:51:57,290 [INFO] RoadGuard: 📍 GPS: ✅
+2026-04-10 22:51:57,290 [INFO] buzzer: Buzzer initialized on GPIO pin 18
+2026-04-10 22:51:57,291 [INFO] RoadGuard: 🔔 Buzzer: ✅
+2026-04-10 22:52:07,306 [INFO] RoadGuard: 🌐 Server: ⚠️ Offline
+2026-04-10 22:52:07,307 [INFO] RoadGuard: ------------------------------------------------------------
+2026-04-10 22:52:07,307 [INFO] RoadGuard:   Nearby check radius: 150m
+2026-04-10 22:52:07,308 [INFO] RoadGuard:   Nearby check interval: 5.0s
+2026-04-10 22:52:07,308 [INFO] RoadGuard:   Capture interval: 0.033s
+2026-04-10 22:52:07,309 [INFO] RoadGuard: ------------------------------------------------------------
+2026-04-10 22:52:07,309 [INFO] RoadGuard: 🚗 Driving... Press Ctrl+C to stop.
+
+2026-04-10 22:57:49,106 [INFO] RoadGuard: Shutdown signal received...
+2026-04-10 22:57:58,112 [INFO] RoadGuard: 
+🛑 Shutting down RoadGuard...
+2026-04-10 22:57:58,117 [INFO] gps_reader: GPS disconnected
+2026-04-10 22:57:58,118 [INFO] buzzer: Buzzer GPIO cleaned up
+2026-04-10 22:57:58,118 [INFO] RoadGuard: 
+📊 Session Summary:
+2026-04-10 22:57:58,118 [INFO] RoadGuard:   New potholes reported: 0
+2026-04-10 22:57:58,119 [INFO] RoadGuard:   Potholes verified:     0
+2026-04-10 22:57:58,119 [INFO] RoadGuard:   Potholes resolved:     0
+2026-04-10 22:57:58,120 [INFO] RoadGuard:   Offline queue:         0 pending
+2026-04-10 22:57:58,120 [INFO] RoadGuard: Goodbye! 👋
+
+2026-04-10 22:58:21,325 [INFO] RoadGuard: ============================================================
+2026-04-10 22:58:21,326 [INFO] RoadGuard:   RoadGuard v2.0 — Collaborative Pothole Verification
+2026-04-10 22:58:21,327 [INFO] RoadGuard:   Vehicle ID: car-001
+2026-04-10 22:58:21,330 [INFO] RoadGuard: ============================================================
+2026-04-10 22:58:21,339 [INFO] RoadGuard: 📷 Camera: ✅ (640x480)
+2026-04-10 22:58:21,569 [INFO] pothole_detector: YOLO model loaded: best.pt
+2026-04-10 22:58:21,570 [INFO] pothole_detector: Model classes: {0: 'Pothole - v1 2024-02-20 5-25pm'}
+2026-04-10 22:58:21,571 [INFO] RoadGuard: 🕳️  Detector: ✅
+2026-04-10 22:58:21,572 [INFO] gps_reader: GPS connected on /dev/ttyS0 at 9600 baud
+2026-04-10 22:58:21,572 [INFO] RoadGuard: 📍 GPS: ✅
+2026-04-10 22:58:21,573 [INFO] buzzer: Buzzer initialized on GPIO pin 18
+2026-04-10 22:58:21,574 [INFO] RoadGuard: 🔔 Buzzer: ✅
+2026-04-10 22:58:21,596 [INFO] RoadGuard: 🌐 Server: ⚠️ Offline
+2026-04-10 22:58:21,596 [INFO] RoadGuard: ------------------------------------------------------------
+2026-04-10 22:58:21,596 [INFO] RoadGuard:   Nearby check radius: 150m
+2026-04-10 22:58:21,597 [INFO] RoadGuard:   Nearby check interval: 5.0s
+2026-04-10 22:58:21,597 [INFO] RoadGuard:   Capture interval: 0.033s
+2026-04-10 22:58:21,597 [INFO] RoadGuard: ------------------------------------------------------------
+2026-04-10 22:58:21,597 [INFO] RoadGuard: 🚗 Driving... Press Ctrl+C to stop.
+
+2026-04-10 23:14:28,177 [INFO] RoadGuard: Shutdown signal received...
+2026-04-10 23:14:33,795 [INFO] RoadGuard: 
+🛑 Shutting down RoadGuard...
+2026-04-10 23:14:33,797 [INFO] gps_reader: GPS disconnected
+2026-04-10 23:14:33,798 [INFO] buzzer: Buzzer GPIO cleaned up
+2026-04-10 23:14:33,798 [INFO] RoadGuard: 
+📊 Session Summary:
+2026-04-10 23:14:33,799 [INFO] RoadGuard:   New potholes reported: 0
+2026-04-10 23:14:33,799 [INFO] RoadGuard:   Potholes verified:     0
+2026-04-10 23:14:33,799 [INFO] RoadGuard:   Potholes resolved:     0
+2026-04-10 23:14:33,799 [INFO] RoadGuard:   Offline queue:         0 pending
+2026-04-10 23:14:33,800 [INFO] RoadGuard: Goodbye! 👋
+
+2026-04-10 23:29:55,441 [INFO] RoadGuard: ============================================================
+2026-04-10 23:29:55,442 [INFO] RoadGuard:   RoadGuard v2.0 — PiCamera2 Edition
+2026-04-10 23:29:55,443 [INFO] RoadGuard:   Vehicle ID: car-001
+2026-04-10 23:29:55,443 [INFO] RoadGuard: ============================================================
+2026-04-10 23:29:55,444 [ERROR] RoadGuard: 📷 PiCamera2: ❌ Library not found. Run 'pip install picamera2'
+2026-04-10 23:29:55,673 [INFO] pothole_detector: YOLO model loaded: best.pt
+2026-04-10 23:29:55,673 [INFO] pothole_detector: Model classes: {0: 'Pothole - v1 2024-02-20 5-25pm'}
+2026-04-10 23:29:55,674 [INFO] RoadGuard: 🕳️  Detector: ✅
+2026-04-10 23:29:55,675 [INFO] gps_reader: GPS connected on /dev/ttyS0 at 9600 baud
+2026-04-10 23:29:55,676 [INFO] RoadGuard: 📍 GPS: ✅
+2026-04-10 23:29:55,677 [INFO] buzzer: Buzzer initialized on GPIO pin 18
+2026-04-10 23:29:55,677 [INFO] RoadGuard: 🔔 Buzzer: ✅
+2026-04-10 23:29:55,821 [INFO] RoadGuard: 🌐 Server: ⚠️ Offline
+2026-04-10 23:29:55,825 [INFO] RoadGuard: ------------------------------------------------------------
+2026-04-10 23:29:55,825 [INFO] RoadGuard:   Capture interval: 0.033s
+2026-04-10 23:29:55,825 [INFO] RoadGuard: 🚗 System Ready. Press 'q' in the window or Ctrl+C to stop.
+
+2026-04-10 23:30:13,674 [INFO] RoadGuard: Shutdown signal received...
+2026-04-10 23:30:15,851 [INFO] RoadGuard: 
+🛑 Shutting down RoadGuard...
+2026-04-10 23:30:15,855 [INFO] gps_reader: GPS disconnected
+2026-04-10 23:30:15,857 [INFO] buzzer: Buzzer GPIO cleaned up
+2026-04-10 23:30:15,858 [INFO] RoadGuard: 📊 Session End. New: 0 | Verified: 0
+2026-04-10 23:30:42,557 [INFO] RoadGuard: ============================================================
+2026-04-10 23:30:42,558 [INFO] RoadGuard:   RoadGuard v2.0 — PiCamera2 Edition
+2026-04-10 23:30:42,558 [INFO] RoadGuard:   Vehicle ID: car-001
+2026-04-10 23:30:42,558 [INFO] RoadGuard: ============================================================
+2026-04-10 23:30:42,559 [ERROR] RoadGuard: 📷 PiCamera2: ❌ Library not found. Run 'pip install picamera2'
+2026-04-10 23:30:42,751 [INFO] pothole_detector: YOLO model loaded: best.pt
+2026-04-10 23:30:42,752 [INFO] pothole_detector: Model classes: {0: 'Pothole - v1 2024-02-20 5-25pm'}
+2026-04-10 23:30:42,752 [INFO] RoadGuard: 🕳️  Detector: ✅
+2026-04-10 23:30:42,753 [INFO] gps_reader: GPS connected on /dev/ttyS0 at 9600 baud
+2026-04-10 23:30:42,753 [INFO] RoadGuard: 📍 GPS: ✅
+2026-04-10 23:30:42,754 [INFO] buzzer: Buzzer initialized on GPIO pin 18
+2026-04-10 23:30:42,754 [INFO] RoadGuard: 🔔 Buzzer: ✅
+2026-04-10 23:30:42,813 [INFO] RoadGuard: 🌐 Server: ⚠️ Offline
+2026-04-10 23:30:42,813 [INFO] RoadGuard: ------------------------------------------------------------
+2026-04-10 23:30:42,813 [INFO] RoadGuard:   Capture interval: 0.033s
+2026-04-10 23:30:42,813 [INFO] RoadGuard: 🚗 System Ready. Press 'q' in the window or Ctrl+C to stop.
+
+2026-04-10 23:31:15,158 [INFO] RoadGuard: Shutdown signal received...
+2026-04-10 23:31:22,867 [INFO] RoadGuard: 
+🛑 Shutting down RoadGuard...
+2026-04-10 23:31:22,869 [INFO] gps_reader: GPS disconnected
+2026-04-10 23:31:22,870 [INFO] buzzer: Buzzer GPIO cleaned up
+2026-04-10 23:31:22,874 [INFO] RoadGuard: 📊 Session End. New: 0 | Verified: 0
+2026-04-10 23:43:26,943 [INFO] RoadGuard: ============================================================
+2026-04-10 23:43:26,944 [INFO] RoadGuard:   RoadGuard v2.0 — PiCamera2 Edition
+2026-04-10 23:43:26,944 [INFO] RoadGuard:   Vehicle ID: car-001
+2026-04-10 23:43:26,944 [INFO] RoadGuard: ============================================================
+2026-04-10 23:43:27,104 [INFO] picamera2.picamera2: Initialization successful.
+2026-04-10 23:43:27,105 [INFO] picamera2.picamera2: Camera now open.
+2026-04-10 23:43:27,111 [INFO] picamera2.picamera2: Camera configuration has been adjusted!
+2026-04-10 23:43:27,113 [INFO] picamera2.picamera2: Configuration successful!
+2026-04-10 23:43:27,212 [INFO] picamera2.picamera2: Camera started
+2026-04-10 23:43:27,213 [INFO] RoadGuard: 📷 PiCamera2: ✅ Started ((640, 480)x(640, 480))
+2026-04-10 23:43:27,673 [INFO] pothole_detector: YOLO model loaded: best.pt
+2026-04-10 23:43:27,674 [INFO] pothole_detector: Model classes: {0: 'Pothole - v1 2024-02-20 5-25pm'}
+2026-04-10 23:43:27,675 [INFO] RoadGuard: 🕳️  Detector: ✅
+2026-04-10 23:43:27,676 [INFO] gps_reader: GPS connected on /dev/ttyS0 at 9600 baud
+2026-04-10 23:43:27,676 [INFO] RoadGuard: 📍 GPS: ✅
+2026-04-10 23:43:27,677 [INFO] buzzer: Buzzer initialized on GPIO pin 18
+2026-04-10 23:43:27,677 [INFO] RoadGuard: 🔔 Buzzer: ✅
+2026-04-10 23:43:27,696 [INFO] RoadGuard: 🌐 Server: ⚠️ Offline
+2026-04-10 23:43:27,696 [INFO] RoadGuard: ------------------------------------------------------------
+2026-04-10 23:43:27,696 [INFO] RoadGuard:   Capture interval: 0.033s
+2026-04-10 23:43:27,697 [INFO] RoadGuard: 🚗 System Ready. Press 'q' in the window or Ctrl+C to stop.
+
+2026-04-10 23:44:40,387 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-10 23:44:40,402 [WARNING] api_client: Connection error (attempt 1/2)
+2026-04-10 23:44:40,919 [WARNING] api_client: Connection error (attempt 2/2)
+2026-04-10 23:44:40,919 [WARNING] api_client: ⚠️ Queueing offline: potholes
+2026-04-10 23:44:40,943 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-10 23:44:40,943 [INFO] RoadGuard: 🕳️  NEW POTHOLE at (0.00000, 0.00000)
+2026-04-10 23:46:37,976 [INFO] pothole_detector: Detected 1 pothole(s): ['low']
+2026-04-10 23:46:37,992 [WARNING] api_client: Connection error (attempt 1/2)
+2026-04-10 23:46:38,504 [WARNING] api_client: Connection error (attempt 2/2)
+2026-04-10 23:46:38,504 [WARNING] api_client: ⚠️ Queueing offline: potholes
+2026-04-10 23:46:38,506 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-10 23:46:38,506 [INFO] RoadGuard: 🕳️  NEW POTHOLE at (0.00000, 0.00000)
+2026-04-10 23:48:01,309 [INFO] pothole_detector: Detected 1 pothole(s): ['critical']
+2026-04-10 23:48:01,320 [WARNING] api_client: Connection error (attempt 1/2)
+2026-04-10 23:48:01,843 [WARNING] api_client: Connection error (attempt 2/2)
+2026-04-10 23:48:01,844 [WARNING] api_client: ⚠️ Queueing offline: potholes
+2026-04-10 23:48:01,845 [INFO] buzzer: 🔔 Buzzer alert: pothole
+2026-04-10 23:48:01,845 [INFO] RoadGuard: 🕳️  NEW POTHOLE at (0.00000, 0.00000)
+2026-04-10 23:52:05,906 [INFO] RoadGuard: Shutdown signal received...
+2026-04-10 23:52:33,567 [INFO] RoadGuard: Shutdown signal received...
+2026-04-10 23:52:33,812 [INFO] RoadGuard: Shutdown signal received...
+2026-04-10 23:52:34,018 [INFO] RoadGuard: Shutdown signal received...
+2026-04-10 23:52:34,217 [INFO] RoadGuard: Shutdown signal received...
+2026-04-10 23:52:34,439 [INFO] RoadGuard: Shutdown signal received...
+2026-04-10 23:52:34,633 [INFO] RoadGuard: Shutdown signal received...
+2026-04-10 23:58:18,002 [INFO] RoadGuard: Shutdown signal received...

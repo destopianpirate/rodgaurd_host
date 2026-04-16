@@ -45,7 +45,10 @@ class ThermalDetector:
 
         if MLX_AVAILABLE:
             try:
-                i2c = busio.I2C(board.SCL, board.SDA, frequency=800000)
+                import board
+                import busio
+                # On Raspberry Pi, use I2C bus 1 (GPIO 2=SDA, GPIO 3=SCL)
+                i2c = busio.I2C(board.D3, board.D2, frequency=400000)
                 self.mlx = adafruit_mlx90640.MLX90640(i2c)
                 self.mlx.refresh_rate = self._get_refresh_rate(refresh_rate)
                 logger.info(f"MLX90640 initialized (refresh rate: {refresh_rate} Hz)")
